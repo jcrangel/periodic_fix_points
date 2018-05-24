@@ -9,4 +9,4 @@ int main(){
     matrix<double> m = DFode(fun,IC,10,0.5);
     std::cout<< m <<std::endl;
 	std::cin.get();//VS windows only
-}
+	}

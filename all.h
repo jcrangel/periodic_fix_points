@@ -58,13 +58,13 @@ struct itikBanks
     itikBanks(std::vector<double> parameters)
     {
         a12 = parameters[0];
-        a21 = parameters[1];
-        a13 = parameters[2];
-        a31 = parameters[3];
-        r2 = parameters[4];
-        r3 = parameters[5];
-        d3 = parameters[6];
-        k3 = parameters[7];
+        a13 = parameters[1];
+        r2 = parameters[2];
+        a21 = parameters[3];
+        r3 = parameters[4];
+        k3 = parameters[5];
+        a31 = parameters[6];
+        d3 = parameters[7];
     }
     void operator()(const stateType &x, stateType &dxdt, double t)
     {
@@ -109,15 +109,15 @@ struct itikBanksJacobian
                     H(times.data(), state[1].data(), times.size()),
                     E(times.data(), state[2].data(), times.size()) 
     {
-		a12 = parameters[0];
-		a21 = parameters[1];
-		a13 = parameters[2];
-		a31 = parameters[3];
-		r2 = parameters[4];
-		r3 = parameters[5];
-		d3 = parameters[6];
-		k3 = parameters[7];
-	}
+        a12 = parameters[0];
+        a13 = parameters[1];
+        r2 = parameters[2];
+        a21 = parameters[3];
+        r3 = parameters[4];
+        k3 = parameters[5];
+        a31 = parameters[6];
+        d3 = parameters[7];
+    }
 	// Row order 
 	// a b
 	// c d 
@@ -131,9 +131,9 @@ struct itikBanksJacobian
         dxdt[3] = -H(t) * a21;
         dxdt[4] = -T(t) * a21 - H(t) * r2 - r2 * (H(t) - 1);
         dxdt[5] = 0;
-        dxdt[6] = (E(t) * r3) / (T(t) + k3) - E(t) * a31 - pow((x[2] * T(t) * r3) / (T(t) + k3), 2);
+        dxdt[6] = (E(t) * r3) / (T(t) + k3) - E(t) * a31 - (E(t) * T(t) * r3) / pow((T(t) + k3), 2);
         dxdt[7] = 0;
-        dxdt[8] = (T(t) * r3) / (T(t) + k3) - T(t) * a31;
+        dxdt[8] = (T(t) * r3) / (T(t) + k3) - T(t) * a31 - d3;
     }
 };
 
@@ -148,33 +148,38 @@ matrix<double> DFode(T &fun,stateType initialCondition,double tau,double d)
 	initialCondition[2] = initialCondition[2] + d;
 	std::vector<stateType> u;
     std::vector<double> tt;
-    size_t steps=integrate( fun , initialCondition , xp[0] , xp[1] , 0.01 ,
-     					   push_back_state_and_time( u , tt ));  
+    typedef runge_kutta_cash_karp54<stateType> error_stepper_type;
+    size_t steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
+                   fun, initialCondition, xp[0], xp[1], 0.001,
+                   push_back_state_and_time(u, tt));
     // u save the data column wise, the firts colum has the first state data. It would
     //be nice to have in row 
     //This create a transpose of u, with dimentions: STATE_SIZE * steps (3 x steps)
     // with elements equal to zero
     std::vector < std::vector < double>> state(STATE_SIZE, std::vector<double>(u.size()));
     transpose(u,state);
-     //Check if its correct	
-     //for( size_t i=0; i <= steps; i++ )
-     //{
-     //    std::cout << tt[i] << '\t' << *(state[2].data() + i) << '\n'; 
-     //    	     // << state[1][i] << '\t' << state[2][i] << '\n';
-     //}
+     //Check if its correct
+    //  for( size_t i=0; i <= steps; i++ )
+    //  {
+    //     std::cout << tt[i] << '\t' << state[0][i] << '\t'
+    //     	     << state[1][i] << '\t' << state[2][i] << '\n';
+    //  }
     std::vector<stateType> V;
     std::vector<double> t;
 
     std::vector<double> param = { 1,2.5,0.5,1.5,4.5,1,0.2,0.5 };
     std::vector<double> identityMatrixVector = {1,0,0,0,1,0,0,0,1};
     itikBanksJacobian Dfu(param,state,tt);
-    steps = integrate(Dfu,identityMatrixVector, xp[0], xp[1], 0.01,
-                      push_back_state_and_time(V, t));
-	//for( size_t i=0; i <= steps; i++ )
-	//{
-	//    std::cout << tt[i] << '\t' << '\n' 
-	//    	      << V[i][0] << '\t' << V[i][1] << '\n';
-	//}
+    steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6), 
+            Dfu, identityMatrixVector, xp[0], xp[1], 0.001,
+            push_back_state_and_time(V, t));
+    for( size_t i=0; i <= steps; i++ )
+	{
+        std::cout << V[i][0] << '\t' << V[i][1] << '\t'
+                  << V[i][2] << '\t' << V[i][3] << '\t' << V[i][4] << '\t'
+                  << V[i][5] << '\t' << V[i][6] << '\t' << V[i][7] << '\t'
+                  << V[i][8] << '\n';
+    }
 
 	// Returns the last matrix since 
 	// DF(x) = v(tau).See page 12 research notebook
