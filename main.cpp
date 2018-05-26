@@ -4,6 +4,8 @@ To do:
 */
 
 #include "all.h"
+#include "itikBanks.h"
+#include "newtonPoincare.h"
 
 
 int main(){

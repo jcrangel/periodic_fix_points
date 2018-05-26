@@ -119,11 +119,11 @@ int main(int /* argc */ , char** /* argv */ )
             x , 0.0 , 10.0 , 0.1 ,
             push_back_state_and_time( x_vec , times ) );
 
-    /* output */
-    for( size_t i=0; i<=steps; i++ )
-    {
-        cout << times[i] << '\t' << x_vec[i][0] << '\t' << x_vec[i][1] << '\n';
-    }
+    // /* output */
+    // for( size_t i=0; i<=steps; i++ )
+    // {
+    //     cout << times[i] << '\t' << x_vec[i][0] << '\t' << x_vec[i][1] << '\n';
+    // }
     //]
 
 
@@ -154,12 +154,14 @@ int main(int /* argc */ , char** /* argv */ )
     //]
 
 
-
+    x[0] = 0;
+    x[1] = 1;
     //[ integrate_adapt
     typedef controlled_runge_kutta< error_stepper_type > controlled_stepper_type;
     controlled_stepper_type controlled_stepper;
-    integrate_adaptive( controlled_stepper , harmonic_oscillator , x , 0.0 , 10.0 , 0.01 );
+    integrate_adaptive( controlled_stepper , ho , x , 0.0 , 10.0 , 0.01 );
     //]
+    cout << x[0] << " , " << x[1] << endl;
 
     {
     //[integrate_adapt_full
@@ -197,10 +199,10 @@ int main(int /* argc */ , char** /* argv */ )
     
     
     //[ harm_iterator_const_step]
-    std::for_each( make_const_step_time_iterator_begin( stepper , harmonic_oscillator, x , 0.0 , 0.1 , 10.0 ) ,
-                   make_const_step_time_iterator_end( stepper , harmonic_oscillator, x ) ,
-                   []( std::pair< const state_type & , const double & > x ) {
-                       cout << x.second << " " << x.first[0] << " " << x.first[1] << "\n"; } );
+    // std::for_each( make_const_step_time_iterator_begin( stepper , harmonic_oscillator, x , 0.0 , 0.1 , 10.0 ) ,
+    //                make_const_step_time_iterator_end( stepper , harmonic_oscillator, x ) ,
+    //                []( std::pair< const state_type & , const double & > x ) {
+    //                    cout << x.second << " " << x.first[0] << " " << x.first[1] << "\n"; } );
     //]
     #endif
     
