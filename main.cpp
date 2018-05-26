@@ -1,6 +1,12 @@
 /*
 To do:
 1. Define StateTye as Vector3d so is congruent with all the program.
+    -- Create a function that integrate inside use std::vector outside return Vector3d
+    --
+Symbols:
+        #_# means that part of the should be rewritten to support systems of several size
+        !@_@ incongruence with Vector and std::vector
+
 */
 
 #include "all.h"
