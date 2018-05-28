@@ -3,15 +3,20 @@ To do:
 1. Define StateTye as Vector3d so is congruent with all the program.
     -- Create a function that integrate inside use std::vector outside return Vector3d
     --
+2. Theres lots code chucks were a ode is solve it, but only the last value is needed. And save all
+the state values is unnecesary
+
 Symbols:
         #_# means that part of the should be rewritten to support systems of several size
         !@_@ incongruence with Vector and std::vector
+        *_* unnecesary state saving
 
 */
 
 #include "all.h"
 #include "itikBanks.h"
 #include "newtonPoincare.h"
+#include "fixPointsInSpace"
 
 
 int main(){

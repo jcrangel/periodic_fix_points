@@ -23,8 +23,8 @@ Matrix3d DFode(T &fun,stateType initialCondition,double tau,double d)
     // with elements equal to zero
     std::vector < std::vector < double>> state(STATE_SIZE, std::vector<double>(u.size()));
     transpose(u,state);
-     //Check if its correct
-    //  for( size_t i=0; i <= steps; i++ )
+    //Check if its correct
+    //  for( size_t /=0; i <= steps; i++ )
     //  {
     //     std::cout << tt[i] << '\t' << state[0][i] << '\t'
     //     	     << state[1][i] << '\t' << state[2][i] << '\n';
@@ -34,7 +34,9 @@ Matrix3d DFode(T &fun,stateType initialCondition,double tau,double d)
 	//!!!! this param shoul exist only on one place not to be repated
     std::vector<double> param = { 1,2.5,0.5,1.5,4.5,1,0.2,0.5 };
     std::vector<double> identityMatrixVector = {1,0,0,0,1,0,0,0,1};
+    
     itikBanksJacobian Dfu(param,state,tt);
+    
     steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6), 
             Dfu, identityMatrixVector, xp[0], xp[1], 0.001,
             push_back_state_and_time(V, t));
