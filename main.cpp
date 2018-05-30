@@ -21,8 +21,6 @@ Symbols:
 
 int main(){
 
-	
-
 	itikBanks fun(PARAMETERS);
 	fixPoints S = al21(0.1, 0.1, 0.1, 2, 2, 2, fun, 10, 0.5);
 

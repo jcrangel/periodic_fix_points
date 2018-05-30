@@ -77,7 +77,7 @@ fixPoints al22(double xi, double xf, double yi, double yf, double zi, double zf,
 	//MatrixXd Fx = MatrixXd::Zero(8,3); // #_#
 	std::vector<Vector3d> Fx;  //Vector of solutions , each solution is a Vector3d
 //First solution
-	Fx[0] = evalFunInLast(functionName, std::vector<double> {xi, yi, zi}, tau, d);
+	Fx.push_back(evalFunInLast(functionName, std::vector<double> {xi, yi, zi}, tau, d));
 	pointxyz first(Fx[0][0] - xi, Fx[0][1] - yi, Fx[0][2] - zi);
 	bool xgood = false;
 	bool ygood = false;
@@ -105,7 +105,7 @@ fixPoints al22(double xi, double xf, double yi, double yf, double zi, double zf,
 				}
 
 				//Step1
-				Fx[n] = evalFunInLast(functionName, std::vector<double> {xi, yi, zi}, tau, d);
+				Fx.push_back(evalFunInLast(functionName, std::vector<double> {xi, yi, zi}, tau, d));
 				//Not effice to create every loop?   //#_#
 				pointxyz fminus(Fx[n][0] - xi, Fx[n][1] - yi, Fx[n][2] - zi);
 
