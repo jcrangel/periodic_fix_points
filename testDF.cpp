@@ -13,19 +13,16 @@ using namespace boost::numeric::odeint;
 
 int main()
 {
-std::vector<Vector3d> Fx;  //Vector of solutions , each solution is a Vector3d
-Matrix3d I3=  Matrix3d::Identity(3, 3);							
-double xi=0.1,yi=0.1,zi=0.1; 									
+	Vector3d Fx(3);  //Vector of solutions , each solution is a Vector3d
+	Fx << 0.8, 0.02, 0.03;
+	Matrix3d I3=  Matrix3d::Identity(3, 3);															
+	
+	double tau=10,d=0.5;
+	Matrix3d T = DFitikBanks(toStdVectorD(Fx), tau);
+	T = T - I3;
+	double firstDet = T.determinant();
 
-Vector3d a;
-a[0]=1;
-a[1]=2;
-a[2]=3; 
-Fx.push_back(a);
+	cout<< firstDet;
 
-double tau=10,d=0.5;
-
-double firstDet = (DFitikBanks( std::vector<double> {xi,yi,zi}, Fx[0], tau, d ) - I3 ).determinant();
-
-cout<< firstDet;
+	cin.get();
 }

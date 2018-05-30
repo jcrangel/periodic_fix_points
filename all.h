@@ -5,7 +5,7 @@
 #include <cmath>
 //Boosst lib
 //#include <boost/numeric/ublas/matrix.hpp>
-//#include <boost/numeric/ublas/io.hpp>
+//#include <boost/numeric/ublas/vector.hpp>
 #include <Eigen/Dense>
 #include <boost/numeric/odeint.hpp>
 #include <boost/math/interpolators/barycentric_rational.hpp>
@@ -13,6 +13,9 @@
 #define STATE_SIZE 3
 #define CONTROL_POS 2
 #define DEBUG false
+
+const std::vector<double> PARAMETERS = { 1,2.5,0.5,1.5,4.5,1,0.2,0.5 };
+
 using namespace Eigen;
 using namespace boost::numeric::odeint;
 
@@ -100,6 +103,10 @@ bool equal(double A, double B, double epsilon = 0.0005f)
     return (fabs(A - B) < epsilon);
 }
 
-
-
+std::vector<double> toStdVectorD(Vector3d v) {
+	std::vector<double> v2;
+	v2.resize(v.size());
+	VectorXd::Map(&v2[0], v.size()) = v;
+	return v2;
+}
 #endif

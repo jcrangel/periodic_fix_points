@@ -35,7 +35,7 @@ Matrix3d DFode(T &fun,stateType initialCondition,double tau,double d)
     std::vector<double> param = { 1,2.5,0.5,1.5,4.5,1,0.2,0.5 };
     std::vector<double> identityMatrixVector = {1,0,0,0,1,0,0,0,1};
     
-    itikBanksJacobian Dfu(param,state,tt);
+    itikBanksJacobianUt Dfu(param,state,tt);
     
     steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6), 
             Dfu, identityMatrixVector, xp[0], xp[1], 0.001,

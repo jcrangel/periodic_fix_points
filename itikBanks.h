@@ -3,6 +3,8 @@
 
 
 #include "all.h"
+
+
 //Itikbanks model from Wei2014
 struct itikBanks
 {
@@ -31,7 +33,8 @@ struct itikBanks
     }
 };
 
-struct itikBanksJacobian
+//This jacobian is calculated over all one solution X(t)
+struct itikBanksJacobianUt
 {
 	
     double a12, a21, a13, a31; 
@@ -42,7 +45,7 @@ struct itikBanksJacobian
     boost::math::barycentric_rational<double> H;
     boost::math::barycentric_rational<double> E;
     
-    itikBanksJacobian(std::vector<double> parameters, std::vector< std::vector<double> > xx, std::vector<double> tt) 
+    itikBanksJacobianUt(std::vector<double> parameters, std::vector< std::vector<double> > xx, std::vector<double> tt) 
                     :state(xx), 
                     times(tt), 
                     T(times.data(), state[0].data(), times.size()),
@@ -104,25 +107,56 @@ struct itikBanksJacobian
 	//}
 };
 
+//This ja
+struct itikBanksJacobian
+{
 
-// %Gets the jacobian following the procedure in eq (6)&(7) with state values at Fx
+	double a12, a21, a13, a31;
+	double r2, r3, d3, k3;
+	double T;
+	double H;
+	double E;
+
+	itikBanksJacobian(std::vector<double> parameters,double T_,double H_, double E_):
+		T(T_),
+		H(H_),
+		E(E_)
+	{
+		a12 = parameters[0];
+		a13 = parameters[1];
+		r2 = parameters[2];
+		a21 = parameters[3];
+		r3 = parameters[4];
+		k3 = parameters[5];
+		a31 = parameters[6];
+		d3 = parameters[7];
+	}
+	void operator()(const stateType &x, stateType &dxdt, double t)
+	{
+		dxdt[0] = (1 - E * a13 - H * a12 - 2 * T) * x[0] + (-T * a12)* x[3] + (-T * a13)* x[6];
+		dxdt[1] = (1 - E * a13 - H * a12 - 2 * T) * x[1] + (-T * a12)* x[4] + (-T * a13)* x[7];
+		dxdt[2] = (1 - E * a13 - H * a12 - 2 * T) * x[2] + (-T * a12)* x[5] + (-T * a13)* x[8];
+
+		dxdt[3] = (-H * a21) * x[0] + (-T * a21 - H * r2 - r2 * (H - 1)) * x[3];
+		dxdt[4] = (-H * a21) * x[1] + (-T * a21 - H * r2 - r2 * (H - 1)) * x[4];
+		dxdt[5] = (-H * a21) * x[2] + (-T * a21 - H * r2 - r2 * (H - 1)) * x[5];
+
+		dxdt[6] = ((E * r3) / (T + k3) - E * a31 - (E * T * r3) / pow((T + k3), 2))* x[0] + ((T * r3) / (T + k3) - T * a31 - d3)* x[6];
+		dxdt[7] = ((E * r3) / (T + k3) - E * a31 - (E * T * r3) / pow((T + k3), 2))* x[1] + ((T * r3) / (T + k3) - T * a31 - d3)* x[7];
+		dxdt[8] = ((E * r3) / (T + k3) - E * a31 - (E * T * r3) / pow((T + k3), 2))* x[2] + ((T * r3) / (T + k3) - T * a31 - d3)* x[8];
+	}
+
+};
+// %Gets the jacobian following the procedure in eq (6)&(7) with state values at Fx (only one)
 // Receive the function in row mayor order, and then return it has a matrix
-Matrix3d DFitikBanks(std::vector<double> initialCondition,
-            Vector3d Fx,double tau,double d){
+Matrix3d DFitikBanks(std::vector<double> Fx,double tau){
 
     std::vector<stateType> V;
     std::vector<double> t;
     std::vector<double> xp={0,tau};
-    //!!!! this param shoul exist only on one place not to be repated
-    std::vector<double> param = { 1,2.5,0.5,1.5,4.5,1,0.2,0.5 };
-    std::vector<std::vector<double>> state; 
-    state[0].push_back(Fx[0]);
-    state[1].push_back(Fx[1]);
-    state[2].push_back(Fx[2]);
 
-    std::vector<double> tt={0};
-    itikBanksJacobian Dfu(param,state,tt);
-    typedef runge_kutta_cash_karp54<stateType> error_stepper_type;
+    itikBanksJacobian Dfu(PARAMETERS,Fx[0],Fx[1],Fx[2]);
+    typedef runge_kutta_dopri5<stateType> error_stepper_type;
 
     std::vector<double> identityMatrixVector = {1,0,0,0,1,0,0,0,1};
     size_t steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6), 

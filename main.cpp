@@ -16,20 +16,20 @@ Symbols:
 #include "all.h"
 #include "itikBanks.h"
 #include "newtonPoincare.h"
-#include "fixPointsInSpace"
+#include "fixPointsInSpace.h"
 
 
 int main(){
 
-	stateType IC = {0,1,0.06};
-	std::vector<double> param={1,2.5,0.5,1.5,4.5,1,0.2,0.5};
-	itikBanks fun(param);
-	Matrix3d m = DFode(fun,IC,10,0.5);
-	std::cout << m << std::endl;
+	
 
-	fixPoint a = newtonPoincare(fun, IC, 10, 0.5);
+	itikBanks fun(PARAMETERS);
+	fixPoints S = al21(0.1, 0.1, 0.1, 2, 2, 2, fun, 10, 0.5);
 
-	std::cout <<"Convergent?:\n"<< a.convergent <<"\n Sol: \n"<< a.solution <<"\n Stable?:\n" << a.stability<<std::endl;
+	for (fixPoint i : S) {
+		std::cout << i.solution[0] << " " << i.solution[1] << " " << i.solution[2]
+				  << " " << i.stability;
+	}
 	std::cin.get();//VS windows only
 	return 0;
 }
