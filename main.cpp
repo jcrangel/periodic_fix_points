@@ -19,15 +19,17 @@ Symbols:
 #include "fixPointsInSpace.h"
 
 
+//typedef std::vector<fixPoint> fixPoints;
 int main(){
 
 	itikBanks fun(PARAMETERS);
-	fixPoints S = al21(0.1, 0.1, 0.1, 2, 2, 2, fun, 10, 0.5);
+	std::vector<fixPoint> S = al21(0.1, 0.1, 0.1, 2, 2, 2, fun, 10, 0.5);
 
 	for (fixPoint i : S) {
 		std::cout << i.solution[0] << " " << i.solution[1] << " " << i.solution[2]
 				  << " " << i.stability;
 	}
+	std::cout<<"program finished!"<< std::endl;
 	std::cin.get();//VS windows only
 	return 0;
 }

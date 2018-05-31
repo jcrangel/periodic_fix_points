@@ -8,13 +8,12 @@ That is the algorithms 2.1 and 2.2 of Wei 2014
 
 #include "all.h"
 
-typedef std::vector<fixPoint> fixPoints;
 
 //Return a set(vector) of fixed points
 template <class T>
-fixPoints al21(double xmax, double ymax, double zmax, double M, double N, double L, T &functionName, double tau, double d)
+std::vector<fixPoint> al21(double xmax, double ymax, double zmax, double M, double N, double L, T &functionName, double tau, double d)
 {
-	fixPoints S;
+	std::vector<fixPoint> S;
 	double xstep = xmax / M;
 	double ystep = ymax / N;
 	double zstep = zmax / L;
@@ -22,17 +21,19 @@ fixPoints al21(double xmax, double ymax, double zmax, double M, double N, double
 	double ymin = 0;
 	double zmin = 0;
 
-	fixPoints O;
+	std::vector<fixPoint> temp;
 
-	for (int i = xmin; i <= xmax; i += xstep)
-		for (int j = ymin; j <= ymax; j += ystep)
-			for (int k = zmin; k <= zmax; k += zstep)
+//concat
+//vector1.insert( vector1.end(), vector2.begin(), vector2.end() );
+
+
+	for (double i = xmin; i <= xmax; i += xstep)
+		for (double j = ymin; j <= ymax; j += ystep)
+			for (double k = zmin; k <= zmax; k += zstep)
 			{
-				O = al22(i, i + xstep, j, j + ystep, k, k + zstep, O,
-					functionName, tau, d, 6);
+				temp = al22(i, i + xstep, j, j + ystep, k, k + zstep, S,functionName, tau, d, 6) ;
+                S.insert(S.end(),temp.begin(),temp.end());
 			}
-	S = O;
-
 	return S;
 
 }
@@ -67,8 +68,8 @@ struct pointxyz
 
 
 template <class T>
-fixPoints al22(double xi, double xf, double yi, double yf, double zi, double zf,
-	fixPoints S, T &functionName, double tau, double d, int deepness)
+std::vector<fixPoint> al22(double xi, double xf, double yi, double yf, double zi, double zf,
+	std::vector<fixPoint> S, T &functionName, double tau, double d, int deepness)
 {
 
 	if (deepness <= 0)
@@ -123,7 +124,7 @@ fixPoints al22(double xi, double xf, double yi, double yf, double zi, double zf,
 				if (mulz <= 0) zgood = true;
 
 
-				//%if actually changes from 0, we take it as a sing change.
+				//%if actually changes from 0, we take it as a sign change.
 				if (equal(first.x, 0) && !equal(fminus.x, 0)) xgood = true;
 				if (equal(first.y, 0) && !equal(fminus.y, 0)) ygood = true;
 				if (equal(first.z, 0) && !equal(fminus.z, 0)) zgood = true;
@@ -131,8 +132,8 @@ fixPoints al22(double xi, double xf, double yi, double yf, double zi, double zf,
 				n = n + 1;
 			}
 
-	//%If every element of Fx(xi,yi,zi)-xi has the same sign returns.(The same for %y,z)
-	if (!xgood || !ygood || !zgood)
+	//If every element of Fx(xi,yi,zi)-xi has the same sign returns.(The same for %y,z)
+	if (!(xgood && ygood && zgood))
 		return S;
 
 	if (DEBUG) {
@@ -191,12 +192,13 @@ fixPoints al22(double xi, double xf, double yi, double yf, double zi, double zf,
 		std::vector<double> Y = { yi, ym, yf };
 		std::vector<double> Z = { zi, zm, zf };
 
-
+        std::vector<fixPoint> temp;
 		for (int i = 0; i < STATE_SIZE; ++i)
 			for (int j = 0; j < STATE_SIZE; ++j)
 				for (int k = 0; k < STATE_SIZE; ++k) {
-					S = al22(X[i], X[i + 1], Y[j], Y[j + 1], Z[k], Z[k + 1], S,
+					temp = al22(X[i], X[i + 1], Y[j], Y[j + 1], Z[k], Z[k + 1], S,
 						functionName, tau, d, deepness - 1);
+					 S.insert(S.end(),temp.begin(),temp.end());
 				}
 	}
 
