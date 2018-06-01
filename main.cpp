@@ -10,6 +10,10 @@ Symbols:
         #_# means that part of the should be rewritten to support systems of several size
         !@_@ incongruence with Vector and std::vector
         *_* unnecesary state saving
+Note:
+ The algorithm finds the same points several times. How this can be avoided?
+ -Why to disthinguis beetween std::vector and boost::vector how about just use boost vector
+  for everything
 
 */
 
@@ -21,13 +25,14 @@ Symbols:
 
 //typedef std::vector<fixPoint> fixPoints;
 int main(){
-
-	itikBanks fun(PARAMETERS);
-	std::vector<fixPoint> S = al21(0.1, 0.1, 0.1, 2, 2, 2, fun, 10, 0.5);
+	char op;
+	std::vector<fixPoint> S;
+		itikBanks fun(PARAMETERS);
+		S = al21(0.1, 0.1, 0.1, 2, 2, 2, fun, 10, 0.5);
 
 	for (fixPoint i : S) {
 		std::cout << i.solution[0] << " " << i.solution[1] << " " << i.solution[2]
-				  << " " << i.stability;
+				  << " " << i.stability<<std::endl;
 	}
 	std::cout<<"program finished!"<< std::endl;
 	std::cin.get();//VS windows only

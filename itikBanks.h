@@ -6,6 +6,7 @@
 
 
 //Itikbanks model from Wei2014
+
 struct itikBanks
 {
     //The parameters
@@ -34,18 +35,19 @@ struct itikBanks
 };
 
 //This jacobian is calculated over all one solution X(t)
+
 struct itikBanksJacobianUt
 {
 	
     double a12, a21, a13, a31; 
     double r2, r3, d3, k3;
-    std::vector<std::vector<double>> state;
-    std::vector<double> times;
+    std::vector<stateType> state;
+	stateType times;
     boost::math::barycentric_rational<double> T;
     boost::math::barycentric_rational<double> H;
     boost::math::barycentric_rational<double> E;
     
-    itikBanksJacobianUt(std::vector<double> parameters, std::vector< std::vector<double> > xx, std::vector<double> tt) 
+    itikBanksJacobianUt(std::vector<double> parameters, std::vector< stateType > xx, stateType tt)
                     :state(xx), 
                     times(tt), 
                     T(times.data(), state[0].data(), times.size()),
@@ -108,6 +110,7 @@ struct itikBanksJacobianUt
 };
 
 //This ja
+
 struct itikBanksJacobian
 {
 
@@ -116,7 +119,7 @@ struct itikBanksJacobian
 	double T;
 	double H;
 	double E;
-
+	
 	itikBanksJacobian(std::vector<double> parameters,double T_,double H_, double E_):
 		T(T_),
 		H(H_),
@@ -147,24 +150,27 @@ struct itikBanksJacobian
 	}
 
 };
+
 // %Gets the jacobian following the procedure in eq (6)&(7) with state values at Fx (only one)
 // Receive the function in row mayor order, and then return it has a matrix
-Matrix3d DFitikBanks(std::vector<double> Fx,double tau){
 
-    std::vector<stateType> V;
-    std::vector<double> t;
-    std::vector<double> xp={0,tau};
+Matrix3d DFitikBanks(stateType Fx,double tau){
+
+    //std::vector<stateType> V;
+    //std::vector<double> t;
+	stateType xp={0,tau};
 
     itikBanksJacobian Dfu(PARAMETERS,Fx[0],Fx[1],Fx[2]);
     typedef runge_kutta_dopri5<stateType> error_stepper_type;
 
-    std::vector<double> identityMatrixVector = {1,0,0,0,1,0,0,0,1};
-    size_t steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6), 
-            Dfu, identityMatrixVector, xp[0], xp[1], 0.001,
-            push_back_state_and_time(V, t));
+	stateType identityMatrixVector = {1,0,0,0,1,0,0,0,1};
+	size_t steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
+		Dfu, identityMatrixVector, xp[0], xp[1], 0.001);
+            //push_back_state_and_time(V, t));
     // Returns the last matrix since 
     // DF(x) = v(tau).See page 12 research notebook
-    return reshapeVectorToMatrix(V.back());
+   // return reshapeVectorToMatrix(V.back());
+	return reshapeVectorToMatrix(identityMatrixVector);
 }
 
 

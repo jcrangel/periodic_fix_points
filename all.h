@@ -23,6 +23,7 @@ using namespace boost::numeric::odeint;
 //typedef std::array< double, STATE_SIZE > stateType;
 typedef std::vector< double > stateType;
 
+
 //The class represents eigenvector
 class fixPoint
 {
@@ -42,12 +43,13 @@ public:
 
 
 //[ integrate_observer
+
 struct push_back_state_and_time
 {
     std::vector< stateType >& m_states;
-    std::vector< double >& m_times;
+	stateType & m_times;
 
-    push_back_state_and_time( std::vector< stateType > &states, std::vector< double > &times )
+    push_back_state_and_time( std::vector< stateType > &states, stateType &times )
         : m_states( states ), m_times( times ) { }
 
     void operator()( const stateType &x, double t )
@@ -58,8 +60,9 @@ struct push_back_state_and_time
 };
 
 //Transpose a matrix of made with std::vector's
+
 void transpose(const std::vector < stateType> u,
-               std::vector < std::vector<double> > & state )
+               std::vector < stateType > & state )
 {
     //Copy the data as transpose
     //for some stupid reason in windows we need i < u.size in ubuntu ins i <= u.size
@@ -75,6 +78,7 @@ void transpose(const std::vector < stateType> u,
 
 //Reshape a vector Size N^2 into a Matrix NxN,
 //vector is assumed to come in row order
+
 Matrix3d reshapeVectorToMatrix(const stateType x)
 {
 
@@ -119,4 +123,6 @@ std::vector<double> toStdVectorD(Vector3d v)
     VectorXd::Map(&v2[0], v.size()) = v;
     return v2;
 }
+
+
 #endif
