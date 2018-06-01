@@ -25,17 +25,9 @@ Note:
 
 //typedef std::vector<fixPoint> fixPoints;
 int main(){
-<<<<<<< HEAD
-
-	itikBanks fun(PARAMETERS);
-	std::cout << "LELE";
-	std::vector<fixPoint> S = al21(0.1, 0.1, 0.1, 2, 2, 2, fun, 10, 0.5);
-=======
-	char op;
 	std::vector<fixPoint> S;
 		itikBanks fun(PARAMETERS);
 		S = al21(0.1, 0.1, 0.1, 2, 2, 2, fun, 10, 0.5);
->>>>>>> nostiff
 
 	for (fixPoint i : S) {
 		std::cout << i.solution[0] << " " << i.solution[1] << " " << i.solution[2]
