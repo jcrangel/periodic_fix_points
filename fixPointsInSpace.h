@@ -31,7 +31,7 @@ std::vector<fixPoint> al21(double xmax, double ymax, double zmax, double M, doub
 		for (j = ymin; j <= ymax; j += ystep)
 			for ( k = zmin; k <= zmax; k += zstep)
 			{
-				//Since where pasing S as a reference, each al22 modify S. If we want parallelism S must be 
+				//Since where pasing S as a reference, each al22 modify S. If we want parallelism S must be
 				//part of a reduction or something
 				al22(i, i + xstep, j, j + ystep, k, k + zstep, S,functionName, tau, d, 6) ;
                 //S.insert(S.end(),temp.begin(),temp.end());
@@ -51,8 +51,8 @@ Vector3d evalFunInLast(T &functionName, stateType initialCondition, double tau, 
 	initialCondition[CONTROL_POS] = initialCondition[CONTROL_POS] + d;
 
 	size_t num_of_steps = integrate_const(make_dense_output< rosenbrock4< double > >(1.0e-6, 1.0e-6),
-		make_pair(functionName, J),
-		x, 0.0, 50.0, 0.01)
+		std::make_pair(functionName, J),
+		x, 0.0, 50.0, 0.01);
 
 		std::vector<double> res;
 		std::copy(x.begin(), x.end(), res.begin());
@@ -70,7 +70,7 @@ struct pointxyz
 	pointxyz(double x_, double y_, double z_) :
 		x(x_), y(y_), z(z_) {}
 };
- 
+
 
 template <class T>
 void al22(double xi, double xf, double yi, double yf, double zi, double zf,
@@ -84,7 +84,7 @@ void al22(double xi, double xf, double yi, double yf, double zi, double zf,
 	std::vector<Vector3d> Fx;  //Vector of solutions , each solution is a Vector3d
 //First solution
 	Fx.push_back(evalFunInLast(functionName, std::vector<double> {xi, yi, zi}, tau, d));
-	
+
 	pointxyz first(Fx[0][0] - xi, Fx[0][1] - yi, Fx[0][2] - zi);
 	bool xgood = false;
 	bool ygood = false;

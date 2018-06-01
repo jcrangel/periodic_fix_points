@@ -17,7 +17,7 @@ Note:
 
 */
 
-#include "all.h"
+//#include "all.h"
 #include "itikBanks.h"
 #include "newtonPoincare.h"
 #include "fixPointsInSpace.h"

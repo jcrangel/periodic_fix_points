@@ -18,22 +18,22 @@ Matrix3d DFode(T &fun, stateType initialCondition,double tau,double d)
                    fun, initialCondition, xp[0], xp[1], 0.001,
                    push_back_state_and_time(u, tt));
     // u save the data column wise, the firts colum has the first state data. It would
-    //be nice to have in row 
+    //be nice to have in row
     //This create a transpose of u, with dimentions: STATE_SIZE * steps (3 x steps)
     // with elements equal to zero
     std::vector < stateType> state(STATE_SIZE, stateType(u.size()));
     transpose(u,state);
-  
+
 	//!!!! this param shoul exist only on one place not to be repated
 	stateType param = { 1,2.5,0.5,1.5,4.5,1,0.2,0.5 };
 	stateType identityMatrixVector = {1,0,0,0,1,0,0,0,1};
-    
+
     itikBanksJacobianUt Dfu(param,state,tt);
-    
+
 	steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
 		Dfu, identityMatrixVector, xp[0], xp[1], 0.001);
 
-	// Returns the last matrix since 
+	// Returns the last matrix since
 	// DF(x) = v(tau).See page 12 research notebook
 	return reshapeVectorToMatrix(identityMatrixVector);
 };
@@ -69,11 +69,11 @@ fixPoint newtonPoincare(T &fun, stateType initialCondition, double tau, double d
         initialCondition[2] = Xk[2]+d;
 
         steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
-            fun,                //!@_@                          
+            fun,                //!@_@
             initialCondition,
             xp[0], xp[1], 0.001, push_back_state_and_time(u, t));
         //[t, u] = ode15s(functionName, xp, [Xk(1), Xk(2), Xk(3) + d], [], [parameters d]);
-        
+
         //!@This should be done in a bette wway
         Pxk[0] = u.back()[0];
         Pxk[1] = u.back()[1];
@@ -83,21 +83,21 @@ fixPoint newtonPoincare(T &fun, stateType initialCondition, double tau, double d
         //Solve Ay = (Pxk-Xk)
         y = A.colPivHouseholderQr().solve(Pxk-Xk);
         Xplus = Xk - y;
-        
+
         eps = y.norm();
         if (eps < tol)
             break;
-    
+
         Xk = Xplus;  //%update x
         n++;
-        
+
     }
     // 0 means unstable
     double stability = 0;
     bool convergence = false;
     if (n < maxStep){
         convergence = true;
-        
+
         if (isStable(df))
             stability = 1;
 

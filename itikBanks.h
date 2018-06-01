@@ -69,11 +69,11 @@ struct itikBanks_jacobi
 			M(2, 0) = (E * r3) / (T + k3) - E * a31 - (E * T * r3) / pow((T + k3), 2);
 			M(2, 1) = 0;
 			M(2, 2) = (T * r3) / (T + k3) - T * a31 - d3;
-			
+
 			dfdt[0] = 0;
 			dfdt[1] = 0;
 			dfdt[2] = 0;
-		
+
 	}
 };
 
@@ -81,21 +81,21 @@ struct itikBanks_jacobi
 
 struct itikBanksJacobianUt
 {
-	
-    double a12, a21, a13, a31; 
+
+    double a12, a21, a13, a31;
     double r2, r3, d3, k3;
     std::vector<stateType> state;
 	stateType times;
     boost::math::barycentric_rational<double> T;
     boost::math::barycentric_rational<double> H;
     boost::math::barycentric_rational<double> E;
-    
+
     itikBanksJacobianUt(std::vector<double> parameters, std::vector< stateType > xx, stateType tt)
-                    :state(xx), 
-                    times(tt), 
+                    :state(xx),
+                    times(tt),
                     T(times.data(), state[0].data(), times.size()),
                     H(times.data(), state[1].data(), times.size()),
-                    E(times.data(), state[2].data(), times.size()) 
+                    E(times.data(), state[2].data(), times.size())
     {
         a12 = parameters[0];
         a13 = parameters[1];
@@ -109,12 +109,12 @@ struct itikBanksJacobianUt
 	//Equation (7) Wei 2014
 	// Row ordr
 	// a b
-	// c d 
+	// c d
 	// is returned as  [a b c d ] ^ T
 
 	//
 	//{ {D1, D2, D3},    { { x1, x2, x3 },
-	//{ D4, D5, D6 }, X  { x4, x5, x6 },        
+	//{ D4, D5, D6 }, X  { x4, x5, x6 },
 	//{ D7, D8, D9 }}    { x7, x8, x9 }}
 	//=
 	//(D1 x1 + D2 x4 + D3 x7 | D1 x2 + D2 x5 + D3 x8 | D1 x3 + D2 x6 + D3 x9
@@ -129,7 +129,7 @@ struct itikBanksJacobianUt
 		dxdt[3] = (-H(t) * a21) * x[0] + (-T(t) * a21 - H(t) * r2 - r2 * (H(t) - 1)) * x[3];
 		dxdt[4] = (-H(t) * a21) * x[1] + (-T(t) * a21 - H(t) * r2 - r2 * (H(t) - 1)) * x[4];
 		dxdt[5] = (-H(t) * a21) * x[2] + (-T(t) * a21 - H(t) * r2 - r2 * (H(t) - 1)) * x[5];
-	
+
 		dxdt[6] = ((E(t) * r3) / (T(t) + k3) - E(t) * a31 - (E(t) * T(t) * r3) / pow((T(t) + k3), 2))* x[0] + ((T(t) * r3) / (T(t) + k3) - T(t) * a31 - d3)* x[6];
 		dxdt[7] = ((E(t) * r3) / (T(t) + k3) - E(t) * a31 - (E(t) * T(t) * r3) / pow((T(t) + k3), 2))* x[1] + ((T(t) * r3) / (T(t) + k3) - T(t) * a31 - d3)* x[7];
 		dxdt[8] = ((E(t) * r3) / (T(t) + k3) - E(t) * a31 - (E(t) * T(t) * r3) / pow((T(t) + k3), 2))* x[2] + ((T(t) * r3) / (T(t) + k3) - T(t) * a31 - d3)* x[8];
@@ -162,7 +162,7 @@ struct itikBanksJacobian
 	double T;
 	double H;
 	double E;
-	
+
 	itikBanksJacobian(std::vector<double> parameters,double T_,double H_, double E_):
 		T(T_),
 		H(H_),
@@ -210,7 +210,7 @@ Matrix3d DFitikBanks(stateType Fx,double tau){
 	size_t steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
 		Dfu, identityMatrixVector, xp[0], xp[1], 0.001);
             //push_back_state_and_time(V, t));
-    // Returns the last matrix since 
+    // Returns the last matrix since
     // DF(x) = v(tau).See page 12 research notebook
    // return reshapeVectorToMatrix(V.back());
 	return reshapeVectorToMatrix(identityMatrixVector);
