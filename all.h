@@ -4,8 +4,8 @@
 #include <iostream>
 #include <cmath>
 //Boosst lib
-//#include <boost/numeric/ublas/matrix.hpp>
-//#include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/vector.hpp>
 #include <Eigen/Dense>
 #include <boost/numeric/odeint.hpp>
 #include <boost/math/interpolators/barycentric_rational.hpp>
@@ -22,6 +22,8 @@ using namespace boost::numeric::odeint;
 //An array [x1(t),x2(t),x3(t)]
 //typedef std::array< double, STATE_SIZE > stateType;
 typedef std::vector< double > stateType;
+typedef boost::numeric::ublas::vector< double > vectorBoost;
+typedef boost::numeric::ublas::matrix< double > matrixBoost;
 
 
 //The class represents eigenvector

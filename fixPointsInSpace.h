@@ -43,14 +43,21 @@ std::vector<fixPoint> al21(double xmax, double ymax, double zmax, double M, doub
 template <class T>
 Vector3d evalFunInLast(T &functionName, stateType initialCondition, double tau, double d)
 {
+	vectorBoost x(3);
+	std::copy(initialCondition.begin(), initialCondition.end(), x.begin());
+	itikBanks_jacobi J(PARAMETERS);
+
 	stateType xp = { 0, tau };
 	initialCondition[CONTROL_POS] = initialCondition[CONTROL_POS] + d;
 
-		typedef runge_kutta_cash_karp54<stateType> error_stepper_type;
-		size_t steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
-			functionName, initialCondition, xp[0], xp[1], 0.001);
+	size_t num_of_steps = integrate_const(make_dense_output< rosenbrock4< double > >(1.0e-6, 1.0e-6),
+		make_pair(functionName, J),
+		x, 0.0, 50.0, 0.01)
 
-		Vector3d v(initialCondition.data());
+		std::vector<double> res;
+		std::copy(x.begin(), x.end(), res.begin());
+
+		Vector3d v(res.data());
 		return v;
 	//initialCondition has the last
 }
