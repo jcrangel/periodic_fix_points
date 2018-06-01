@@ -23,6 +23,7 @@ Symbols:
 int main(){
 
 	itikBanks fun(PARAMETERS);
+	std::cout << "LELE";
 	std::vector<fixPoint> S = al21(0.1, 0.1, 0.1, 2, 2, 2, fun, 10, 0.5);
 
 	for (fixPoint i : S) {
