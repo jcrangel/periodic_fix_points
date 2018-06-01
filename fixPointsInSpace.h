@@ -26,35 +26,33 @@ std::vector<fixPoint> al21(double xmax, double ymax, double zmax, double M, doub
 //concat
 //vector1.insert( vector1.end(), vector2.begin(), vector2.end() );
 
-
-	for (double i = xmin; i <= xmax; i += xstep)
-		for (double j = ymin; j <= ymax; j += ystep)
-			for (double k = zmin; k <= zmax; k += zstep)
+	double i, j, k;
+	for (i = xmin; i <= xmax; i += xstep)
+		for (j = ymin; j <= ymax; j += ystep)
+			for ( k = zmin; k <= zmax; k += zstep)
 			{
-				temp = al22(i, i + xstep, j, j + ystep, k, k + zstep, S,functionName, tau, d, 6) ;
-                S.insert(S.end(),temp.begin(),temp.end());
+				//Since where pasing S as a reference, each al22 modify S. If we want parallelism S must be 
+				//part of a reduction or something
+				al22(i, i + xstep, j, j + ystep, k, k + zstep, S,functionName, tau, d, 6) ;
+                //S.insert(S.end(),temp.begin(),temp.end());
 			}
 	return S;
-
 }
 
 //%Evaluate F(x,y,z)
 template <class T>
-Vector3d evalFunInLast(T &functionName,
-	std::vector<double> initialCondition, double tau, double d)
+Vector3d evalFunInLast(T &functionName, stateType initialCondition, double tau, double d)
 {
-	typedef runge_kutta_cash_karp54<stateType> error_stepper_type;
-	std::vector<double > xp = { 0, tau };
+	stateType xp = { 0, tau };
 	initialCondition[CONTROL_POS] = initialCondition[CONTROL_POS] + d;
-	std::vector<stateType> V;
-	std::vector<double> t;
 
-	size_t steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
-		functionName, initialCondition, xp[0], xp[1], 0.001);
+		typedef runge_kutta_cash_karp54<stateType> error_stepper_type;
+		size_t steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
+			functionName, initialCondition, xp[0], xp[1], 0.001);
+
+		Vector3d v(initialCondition.data());
+		return v;
 	//initialCondition has the last
-	Vector3d v(initialCondition.data());
-
-	return v;
 }
 
 struct pointxyz
@@ -68,17 +66,18 @@ struct pointxyz
 
 
 template <class T>
-std::vector<fixPoint> al22(double xi, double xf, double yi, double yf, double zi, double zf,
-	std::vector<fixPoint> S, T &functionName, double tau, double d, int deepness)
+void al22(double xi, double xf, double yi, double yf, double zi, double zf,
+	std::vector<fixPoint> &S, T &functionName, double tau, double d, int deepness)
 {
 
 	if (deepness <= 0)
-		return S;
+		return ;
 
 	//MatrixXd Fx = MatrixXd::Zero(8,3); // #_#
 	std::vector<Vector3d> Fx;  //Vector of solutions , each solution is a Vector3d
 //First solution
 	Fx.push_back(evalFunInLast(functionName, std::vector<double> {xi, yi, zi}, tau, d));
+	
 	pointxyz first(Fx[0][0] - xi, Fx[0][1] - yi, Fx[0][2] - zi);
 	bool xgood = false;
 	bool ygood = false;
@@ -119,9 +118,9 @@ std::vector<fixPoint> al22(double xi, double xf, double yi, double yf, double zi
 				muly = fminus.y*first.y;
 				mulz = fminus.z*first.z;
 
-				if (mulx <= 0) xgood = true;
-				if (muly <= 0) ygood = true;
-				if (mulz <= 0) zgood = true;
+				if (mulx < 0 || equal(mulx, 0)) xgood = true;
+				if (muly < 0 || equal(muly, 0)) ygood = true;
+				if (mulz < 0 || equal(mulz, 0)) zgood = true;
 
 
 				//%if actually changes from 0, we take it as a sign change.
@@ -134,7 +133,7 @@ std::vector<fixPoint> al22(double xi, double xf, double yi, double yf, double zi
 
 	//If every element of Fx(xi,yi,zi)-xi has the same sign returns.(The same for %y,z)
 	if (!(xgood && ygood && zgood))
-		return S;
+		return ;
 
 	if (DEBUG) {
 		std::cout << "Step 3" << std::endl;
@@ -196,9 +195,9 @@ std::vector<fixPoint> al22(double xi, double xf, double yi, double yf, double zi
 		for (int i = 0; i < STATE_SIZE; ++i)
 			for (int j = 0; j < STATE_SIZE; ++j)
 				for (int k = 0; k < STATE_SIZE; ++k) {
-					temp = al22(X[i], X[i + 1], Y[j], Y[j + 1], Z[k], Z[k + 1], S,
+					 al22(X[i], X[i + 1], Y[j], Y[j + 1], Z[k], Z[k + 1], S,
 						functionName, tau, d, deepness - 1);
-					 S.insert(S.end(),temp.begin(),temp.end());
+					 //S.insert(S.end(),temp.begin(),temp.end());
 				}
 	}
 
@@ -220,7 +219,7 @@ std::vector<fixPoint> al22(double xi, double xf, double yi, double yf, double zi
 			}
 END:
 
-	return S;
+	return ;
 }
 
 #endif
