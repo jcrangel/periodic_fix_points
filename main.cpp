@@ -25,7 +25,7 @@ Note:
 
 //typedef std::vector<fixPoint> fixPoints;
 int main(){
-	char op; 
+	char op;  
 	std::vector<fixPoint> S;
 		itikBanks fun(PARAMETERS);
 		S = al21(0.1, 0.1, 0.1, 2, 2, 2, fun, 10, 0.5);

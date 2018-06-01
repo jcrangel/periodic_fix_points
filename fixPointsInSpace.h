@@ -63,7 +63,7 @@ struct pointxyz
 	pointxyz(double x_, double y_, double z_) :
 		x(x_), y(y_), z(z_) {}
 };
-
+ 
 
 template <class T>
 void al22(double xi, double xf, double yi, double yf, double zi, double zf,
