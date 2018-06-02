@@ -45,13 +45,13 @@ Vector3d evalFunInLast(T &functionName, stateType initialCondition, double tau, 
 {
 	vectorBoost x(3);
 	std::copy(initialCondition.begin(), initialCondition.end(), x.begin());
-	itikBanks_jacobi J(PARAMETERS);
-
+	itikBanks_jacobi_stiff J(PARAMETERS);
+	itikBanks_stiff fun(PARAMETERS);
 	stateType xp = { 0, tau };
 	initialCondition[CONTROL_POS] = initialCondition[CONTROL_POS] + d;
 
 	size_t num_of_steps = integrate_const(make_dense_output< rosenbrock4< double > >(1.0e-6, 1.0e-6),
-		std::make_pair(functionName, J),
+		std::make_pair(fun, J),
 		x, 0.0, 50.0, 0.01);
 
 		std::vector<double> res;

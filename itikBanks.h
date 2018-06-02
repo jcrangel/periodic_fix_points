@@ -33,7 +33,33 @@ struct itikBanks
         dxdt[2] = (r3 * x[0] * x[2]) / (k3 + x[0]) - a31 * x[0] * x[2] - d3 * x[2];
     }
 };
-struct itikBanks_jacobi
+struct itikBanks_stiff
+{
+    //The parameters
+    double N;
+
+	double a12, a21, a13, a31;
+    double r2, r3, d3, k3;
+
+    itikBanks_stiff(std::vector<double> parameters)
+    {
+        a12 = parameters[0];
+        a13 = parameters[1];
+        r2 = parameters[2];
+        a21 = parameters[3];
+        r3 = parameters[4];
+        k3 = parameters[5];
+        a31 = parameters[6];
+        d3 = parameters[7];
+    }
+    void operator()(const vectorBoost &x, vectorBoost &dxdt, double /*t*/)
+    {
+        dxdt[0] = x[0] * (1 - x[0]) - a12 * x[0] * x[1] - a13 * x[0] * x[2];
+        dxdt[1] = r2 * x[1] * (1 - x[1]) - a21 * x[0] * x[1];
+        dxdt[2] = (r3 * x[0] * x[2]) / (k3 + x[0]) - a31 * x[0] * x[2] - d3 * x[2];
+    }
+};
+struct itikBanks_jacobi_stiff
 {
 	//The parameters
 	double N;
@@ -41,7 +67,7 @@ struct itikBanks_jacobi
 	double a12, a21, a13, a31;
 	double r2, r3, d3, k3;
 
-	itikBanks_jacobi(std::vector<double> parameters)
+	itikBanks_jacobi_stiff(std::vector<double> parameters)
 	{
 		a12 = parameters[0];
 		a13 = parameters[1];

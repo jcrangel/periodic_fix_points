@@ -24,19 +24,41 @@ void write_cout( const double &x , const double t )
     cout << t << '\t' << x << endl;
 }
 
+/* The rhs of x' = f(x) */
+class harm_osc {
+
+    double m_gam;
+
+public:
+    harm_osc( double gam ) : m_gam(gam) { }
+
+    void operator() ( const state_type &x , state_type &dxdt , const double /* t */ )
+    {
+        dxdt[0] = x[1];
+        dxdt[1] = -x[0] - m_gam*x[1];
+    }
+};
+//]
 // state_type = double 
 // the steper type
-typedef runge_kutta_dopri5< double > stepper_type;
+
 
 int main()
 {
-    double x = 0.0;    
+ //    state_type x = {0,0};    
 
-    //this version just print the solution
-    // //                                  abserr , relerr ,                          
-    integrate_adaptive( make_controlled( 1E-12 , 1E-12 , stepper_type() ) ,
-                        rhs , x , 1.0 , 10.0 , 0.1 , write_cout );
+ //    //this version just print the solution
+ //    // //                                  abserr , relerr ,     
+ //    harm_osc harm(0.1);
+	// typedef runge_kutta_dopri5< double > stepper_type;
+ //    integrate_adaptive( make_controlled( 1E-12 , 1E-12 , stepper_type() ) ,
+ //                        harm , x , 1.0 , 10.0 , 0.1 );
     //     // integrate rhs(x) with from t=1 to t=10 with initial step size = 0.1 
+    //the integrator gives always the last element at the end
+    // cout << endl << x[0] <<" , "<< x[1]<< endl;
 
+    for(double i: vector<double> {10,20,30} ){
+		cout<< i <<" "  ;  	
+    }
 
 }
