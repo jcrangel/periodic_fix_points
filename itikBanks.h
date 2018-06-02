@@ -26,7 +26,7 @@ struct itikBanks
         a31 = parameters[6];
         d3 = parameters[7];
     }
-    void operator()(const vectorBoost &x, vectorBoost &dxdt, double /*t*/)
+    void operator()(const stateType &x, stateType &dxdt, double /*t*/)
     {
         dxdt[0] = x[0] * (1 - x[0]) - a12 * x[0] * x[1] - a13 * x[0] * x[2];
         dxdt[1] = r2 * x[1] * (1 - x[1]) - a21 * x[0] * x[1];

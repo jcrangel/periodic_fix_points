@@ -43,16 +43,18 @@ std::vector<fixPoint> al21(double xmax, double ymax, double zmax, double M, doub
 template <class T>
 Vector3d evalFunInLast(T &functionName, stateType initialCondition, double tau, double d)
 {
+    initialCondition[CONTROL_POS] = initialCondition[CONTROL_POS] + d;
+
 	vectorBoost x(3);
 	std::copy(initialCondition.begin(), initialCondition.end(), x.begin());
+
 	itikBanks_jacobi_stiff J(PARAMETERS);
 	itikBanks_stiff fun(PARAMETERS);
-	stateType xp = { 0, tau };
-	initialCondition[CONTROL_POS] = initialCondition[CONTROL_POS] + d;
+
 
 	size_t num_of_steps = integrate_const(make_dense_output< rosenbrock4< double > >(1.0e-6, 1.0e-6),
 		std::make_pair(fun, J),
-		x, 0.0, 50.0, 0.01);
+		x, 0.0, tau, 0.01);
 
 		std::vector<double> res;
 		std::copy(x.begin(), x.end(), res.begin());
