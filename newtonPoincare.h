@@ -50,15 +50,18 @@ Matrix3d DFode_stiff(T &fun, stateType initialCondition,double tau,double d)
     std::vector<vectorBoost> u;
     stateType tt;
 
+        //  STIFF INTEGRATION------------------
     size_t steps = integrate_const( make_dense_output< rosenbrock4< double > >( 1.0e-6 , 1.0e-6 ) ,
-            make_pair( fun , fun ) ,
-            x , 0.0 , 50.0 , 0.01, push_back_state_and_time<vectorBoost>(u, tt));
+            std::make_pair( fun , fun ) ,
+            x , xp[0] ,xp[1], 0.01, push_back_state_and_time<vectorBoost>(u, tt));
+        //  STIFF INTEGRATION ------------------
 
     // u save the data column wise, the firts colum has the first state data. It would
     //be nice to have in row
     //This create a transpose of u, with dimentions: STATE_SIZE * steps (3 x steps)
     // with elements equal to zero
     std::vector < stateType> state(STATE_SIZE, stateType(u.size()));
+    //notice that this also transform the data from vector boost ublas to std vector
     transpose(u,state);
 
     //!!!! this param shoul exist only on one place not to be repated
@@ -99,12 +102,19 @@ fixPoint newtonPoincare(T &fun, stateType initialCondition, double tau, double d
     typedef runge_kutta_cash_karp54<stateType> error_stepper_type;
 
     //stateType initCond;
+   // stateType XkStd(STATE_SIZE);
 
     while (n < maxStep) {                   //!@_@
-        df = DFode(fun, stateType {Xk[0], Xk[1], Xk[2]}, tau, d);  //Jacobian
-        initialCondition[0] = Xk[0];
-        initialCondition[1] = Xk[1];
-        initialCondition[2] = Xk[2]+d;
+        df = DFode_stiff(fun, stateType {Xk[0], Xk[1], Xk[2]}, tau, d);  //Jacobian
+        initialCondition[0]=Xk[0];
+        initialCondition[1]=Xk[1];
+        initialCondition[2]=Xk[2];
+         //std::copy(Xk.begin(),Xk.end(),initialCondition.begin());
+        initialCondition[CONTROL_POS] = initialCondition[CONTROL_POS] + d;
+
+        //std::copy(Xk.begin(),Xk.end(),initialCondition.begin());
+
+
 
         steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
             fun,                //!@_@
@@ -143,6 +153,86 @@ fixPoint newtonPoincare(T &fun, stateType initialCondition, double tau, double d
     fixPoint ss(convergence, stability, Xk);
     return ss;
 }
+
+
+
+
+template <class T>
+fixPoint newtonPoincare_stiff(T &fun, stateType initialCondition, double tau, double d) {
+    int n = 0;            //%initialize iteration counter
+    double eps = 1;          //%initialize error
+	stateType xp{ 0, tau }; //% define the span of the computational domain
+    double tol = 1e-6;
+    int maxStep = 100;
+
+    Vector3d Xk(initialCondition.data());
+    Vector3d Pxk;
+    Matrix3d df;
+    Matrix3d A;
+    Matrix3d I = Matrix3d::Identity();
+    Vector3d y;
+    Vector3d Xplus;
+    size_t steps;
+    typedef runge_kutta_cash_karp54<stateType> error_stepper_type;
+
+    //stateType initCond;
+
+    while (n < maxStep) {                   //!@_@
+        df = DFode_stiff(fun, stateType {Xk[0], Xk[1], Xk[2]}, tau, d);  //Jacobian
+        initialCondition[0]=Xk[0];
+        initialCondition[1]=Xk[1];
+        initialCondition[2]=Xk[2];
+        //std::copy(Xk.begin(),Xk.end(),initialCondition.begin());
+        initialCondition[CONTROL_POS] = initialCondition[CONTROL_POS] + d;
+
+        //  STIFF INTEGRATION simple------------------
+        stateType u(STATE_SIZE);
+        integrateStiffSystem(fun,initialCondition,u,xp[0],xp[1]);
+//
+//        vectorBoost x(STATE_SIZE);
+//        std::copy(initialCondition.begin(), initialCondition.end(), x.begin());
+//
+//        steps = integrate_const( make_dense_output< rosenbrock4< double > >( 1.0e-6 , 1.0e-6 ) ,
+//            std::make_pair( fun , fun ) ,
+//            x , xp[0] , xp[1] , 0.01);
+//
+//		stateType u(STATE_SIZE);
+//		std::copy(x.begin(), x.end(), u.begin());
+
+        //!@This should be done in a bette wway
+        Pxk[0] = u[0];
+        Pxk[1] = u[1];
+        Pxk[2] = u[2];
+        //  STIFF INTEGRATION END ------------------
+
+        A = df - I;
+        //Solve Ay = (Pxk-Xk)
+        y = A.colPivHouseholderQr().solve(Pxk-Xk);
+        Xplus = Xk - y;
+
+        eps = y.norm();
+        if (eps < tol)
+            break;
+
+        Xk = Xplus;  //%update x
+        n++;
+
+    }
+    // 0 means unstable
+    double stability = 0;
+    bool convergence = false;
+    if (n < maxStep){
+        convergence = true;
+
+        if (isStable(df))
+            stability = 1;
+
+    }
+    fixPoint ss(convergence, stability, Xk);
+    return ss;
+}
+
+
 
 
 #endif

@@ -67,6 +67,7 @@ struct itikBanks_stiff
         dxdt[2] = (r3 * x[0] * x[2]) / (k3 + x[0]) - a31 * x[0] * x[2] - d3 * x[2];
     }
 
+    //The jacobian
     void operator()(const vectorBoost &x, matrixBoost &M, double /*t*/, vectorBoost &dfdt)
 	{
 		double T = x[0];
@@ -91,49 +92,6 @@ struct itikBanks_stiff
 
 	}
 
-};
-struct itikBanks_jacobi_stiff
-{
-	//The parameters
-	double N;
-
-	double a12, a21, a13, a31;
-	double r2, r3, d3, k3;
-
-	itikBanks_jacobi_stiff(std::vector<double> parameters)
-	{
-		a12 = parameters[0];
-		a13 = parameters[1];
-		r2 = parameters[2];
-		a21 = parameters[3];
-		r3 = parameters[4];
-		k3 = parameters[5];
-		a31 = parameters[6];
-		d3 = parameters[7];
-	}
-	void operator()(const vectorBoost &x, matrixBoost &M, double /*t*/, vectorBoost &dfdt)
-	{
-		double T = x[0];
-		double H = x[1];
-		double E = x[2];
-		//The jacobian
-			M(0, 0) = 1 - E * a13 - H * a12 - 2 * T;
-			M(0, 1) = -T * a12;
-			M(0, 2) = -T * a13;
-
-			M(1, 0) = -H * a21;
-			M(1, 1) = -T * a21 - H * r2 - r2 * (H - 1);
-			M(1, 2) = 0;
-
-			M(2, 0) = (E * r3) / (T + k3) - E * a31 - (E * T * r3) / pow((T + k3), 2);
-			M(2, 1) = 0;
-			M(2, 2) = (T * r3) / (T + k3) - T * a31 - d3;
-
-			dfdt[0] = 0;
-			dfdt[1] = 0;
-			dfdt[2] = 0;
-
-	}
 };
 
 //This jacobian is calculated over all one solution X(t)

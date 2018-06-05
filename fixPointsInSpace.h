@@ -45,20 +45,8 @@ Vector3d evalFunInLast(T &functionName, stateType initialCondition, double tau, 
 {
     initialCondition[CONTROL_POS] = initialCondition[CONTROL_POS] + d;
 
-	vectorBoost x(STATE_SIZE);
-	x[0] = initialCondition[0];
-	x[1] = initialCondition[1];
-	x[2] = initialCondition[2];
-	//std::copy(initialCondition.begin(), initialCondition.end(), x.begin());
-
-	//itikBanks_jacobi_stiff J(PARAMETERS);
-	//itikBanks_stiff fun(PARAMETERS);
-	size_t num_of_steps = integrate_const(make_dense_output< rosenbrock4< double > >(1.0e-6, 1.0e-6),
-		std::make_pair(functionName, functionName),
-		x, 0.0, tau, 0.01);
-
 		std::vector<double> res(STATE_SIZE);
-		std::copy(x.begin(), x.end(), res.begin());
+		integrateStiffSystem(functionName,initialCondition,res,0,tau);
 
 		Vector3d v(res.data());
 		return v;
@@ -221,7 +209,7 @@ void al22(double xi, double xf, double yi, double yf, double zi, double zf,
 		for (double j : std::vector<double>{ yi, ym, yf })
 			for (double k : std::vector<double>{ zi, zm, zf }) {
 
-				fixPoint fixPt = newtonPoincare(functionName, stateType{ i,j,k }, tau, d);
+				fixPoint fixPt = newtonPoincare_stiff(functionName, stateType{ i,j,k }, tau, d);
 				if (fixPt.convergent) {
 					S.push_back(fixPt);
 					goto END; //Yes, a goto

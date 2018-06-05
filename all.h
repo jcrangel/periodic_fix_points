@@ -126,5 +126,23 @@ std::vector<double> toStdVectorD(Vector3d v)
     return v2;
 }
 
+//Integrate a ODE system and returns the last value of the integration in x
+//In the stiff version the system should be a class that have the Jacobian as a functor
+template <class T>
+void integrateStiffSystem(T &system, stateType initialCondition,stateType &x,double t0,double tf){
+
+	vectorBoost v(STATE_SIZE);
+
+	std::copy(initialCondition.begin(), initialCondition.end(), v.begin());
+
+	size_t num_of_steps = integrate_const(make_dense_output< rosenbrock4< double > >(1.0e-6, 1.0e-6),
+		std::make_pair(system, system),
+		v, t0, tf, 0.01);
+
+		//std::vector<double> res(STATE_SIZE);
+		std::copy(v.begin(), v.end(), x.begin());
+
+}
+
 
 #endif
