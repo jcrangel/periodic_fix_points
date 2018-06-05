@@ -55,6 +55,21 @@ struct stiff_system_jacobi
 };
 //]
 
+template <class T>
+struct push_back_state_and_time
+{
+    std::vector< T >& m_states;
+    std::vector<double> & m_times;
+
+    push_back_state_and_time( std::vector< T > &states, std::vector<double> &times )
+        : m_states( states ), m_times( times ) { }
+
+    void operator()( const T &x, double t )
+    {
+        m_states.push_back( x );
+        m_times.push_back( t );
+    }
+};
 
 
 /*
@@ -93,12 +108,18 @@ int main( int argc , char **argv )
     vector_type x( 2);
     x[0]=7;
     x[1]=-3;
+    std::vector<vector_type> u;
+    std::vector<double> tt;
     size_t num_of_steps = integrate_const( make_dense_output< rosenbrock4< double > >( 1.0e-6 , 1.0e-6 ) ,
             make_pair( stiff_system() , stiff_system_jacobi() ) ,
-            x , 0.0 , 50.0 , 0.01,cout << phoenix::arg_names::arg2 << " " << phoenix::arg_names::arg1[0] << " " << phoenix::arg_names::arg1[0]<< "\n"  );
+            x , 0.0 , 50.0 , 0.01, push_back_state_and_time<vector_type>(u, tt));
     //]
-    clog << num_of_steps << endl;
-    clog << x[0] <<" "<<x[1] <<endl;
+    //clog << num_of_steps << end;
+    for( size_t i=0; i<= tt.size() - 1 ; i++ )
+    {
+        clog << tt[i] << '\t' << u[i][0] << '\t' << u[i][1] << '\n';
+    }
+    clog << x(0) << " " << x(1)<< endl;
 
 
 
@@ -107,13 +128,14 @@ int main( int argc , char **argv )
 //    typedef dense_output_runge_kutta< controlled_dopri5_type > dense_output_dopri5_type;
     //[ integrate_stiff_system_alternative
 
-//    vector_type x2( 2 , 1.0 );
-//
-//    size_t num_of_steps2 = integrate_const( make_dense_output< runge_kutta_dopri5< vector_type > >( 1.0e-6 , 1.0e-6 ) ,
-//            stiff_system() , x2 , 0.0 , 50.0 , 0.01,cout << phoenix::arg_names::arg2 << " " << phoenix::arg_names::arg1[0] << "\n" );
-//    //]
-//    clog << num_of_steps2 << endl;
-//    clog << x2(0) << " " << x2(1)<< endl;
+   vector_type x2( 2);
+   x2[0]=7;
+   x2[1]=-3;
+   size_t num_of_steps2 = integrate_const( make_dense_output< runge_kutta_dopri5< vector_type > >( 1.0e-6 , 1.0e-6 ) ,
+           stiff_system() , x2 , 0.0 , 50.0 , 0.01,cout << phoenix::arg_names::arg2 << " " << phoenix::arg_names::arg1[0] << "\n" );
+   //]
+   clog << num_of_steps2 << endl;
+   clog << x2(0) << " " << x2(1)<< endl;
 
     return 0;
 }
