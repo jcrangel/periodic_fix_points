@@ -16,7 +16,7 @@ Matrix3d DFode(T &fun, stateType initialCondition,double tau,double d)
     typedef runge_kutta_cash_karp54<stateType> error_stepper_type;
     size_t steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
                    fun, initialCondition, xp[0], xp[1], 0.001,
-                   push_back_state_and_time(u, tt));
+                   push_back_state_and_time<stateType>(u, tt));
     // u save the data column wise, the firts colum has the first state data. It would
     //be nice to have in row
     //This create a transpose of u, with dimentions: STATE_SIZE * steps (3 x steps)
@@ -37,6 +37,44 @@ Matrix3d DFode(T &fun, stateType initialCondition,double tau,double d)
 	// DF(x) = v(tau).See page 12 research notebook
 	return reshapeVectorToMatrix(identityMatrixVector);
 };
+template <class T>
+Matrix3d DFode_stiff(T &fun, stateType initialCondition,double tau,double d)
+{
+// xp=[0, tau];
+    stateType xp{0,tau};
+
+    initialCondition[2] = initialCondition[2] + d;
+
+    vectorBoost x(STATE_SIZE);
+    std::copy(initialCondition.begin(), initialCondition.end(), x.begin());
+    std::vector<vectorBoost> u;
+    stateType tt;
+
+    size_t steps = integrate_const( make_dense_output< rosenbrock4< double > >( 1.0e-6 , 1.0e-6 ) ,
+            make_pair( fun , fun ) ,
+            x , 0.0 , 50.0 , 0.01, push_back_state_and_time<vectorBoost>(u, tt));
+
+    // u save the data column wise, the firts colum has the first state data. It would
+    //be nice to have in row
+    //This create a transpose of u, with dimentions: STATE_SIZE * steps (3 x steps)
+    // with elements equal to zero
+    std::vector < stateType> state(STATE_SIZE, stateType(u.size()));
+    transpose(u,state);
+
+    //!!!! this param shoul exist only on one place not to be repated
+    stateType param = { 1,2.5,0.5,1.5,4.5,1,0.2,0.5 };
+    stateType identityMatrixVector = {1,0,0,0,1,0,0,0,1};
+
+    itikBanksJacobianUt Dfu(param,state,tt);
+    typedef runge_kutta_cash_karp54<stateType> error_stepper_type;
+    steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
+        Dfu, identityMatrixVector, xp[0], xp[1], 0.001);
+
+    // Returns the last matrix since
+    // DF(x) = v(tau).See page 12 research notebook
+    return reshapeVectorToMatrix(identityMatrixVector);
+};
+
 
 
 
@@ -71,7 +109,7 @@ fixPoint newtonPoincare(T &fun, stateType initialCondition, double tau, double d
         steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
             fun,                //!@_@
             initialCondition,
-            xp[0], xp[1], 0.001, push_back_state_and_time(u, t));
+            xp[0], xp[1], 0.001, push_back_state_and_time<stateType>(u, t));
         //[t, u] = ode15s(functionName, xp, [Xk(1), Xk(2), Xk(3) + d], [], [parameters d]);
 
         //!@This should be done in a bette wway

@@ -46,24 +46,24 @@ public:
 
 //[ integrate_observer
 
+template <class T>
 struct push_back_state_and_time
 {
-    std::vector< stateType >& m_states;
-	stateType & m_times;
+    std::vector< T >& m_states;
+    std::vector<double> & m_times;
 
-    push_back_state_and_time( std::vector< stateType > &states, stateType &times )
+    push_back_state_and_time( std::vector< T > &states, std::vector<double> &times )
         : m_states( states ), m_times( times ) { }
 
-    void operator()( const stateType &x, double t )
+    void operator()( const T &x, double t )
     {
         m_states.push_back( x );
         m_times.push_back( t );
     }
 };
-
 //Transpose a matrix of made with std::vector's
-
-void transpose(const std::vector < stateType> u,
+template <class T>
+void transpose(const T u,
                std::vector < stateType > & state )
 {
     //Copy the data as transpose

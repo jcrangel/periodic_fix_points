@@ -297,7 +297,7 @@ Matrix3d DFitikBanks(stateType Fx,double tau){
 // 	identityMatrixVector[7] =1;
 
 // 	size_t num_of_steps = integrate_const(make_dense_output< rosenbrock4< double > >(1.0e-6, 1.0e-6),
-// 						std::make_pair(functionName, functionName),x, 0.0, tau, 0.01);
+// 						std::make_pair(functionName, functionName),identityMatrixVector, 0.0, tau, 0.01);
 
 // 	size_t steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
 // 		Dfu, identityMatrixVector, xp[0], xp[1], 0.001);
