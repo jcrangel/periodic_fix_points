@@ -4,81 +4,6 @@
 #include "all.h"
 //Gets the jacobian following the procedure in eq (6)&(7) of the
 //paper Wei 2014
-template <class T>
-Matrix3d DFode(T &fun, stateType initialCondition,double tau,double d)
-{
-// xp=[0, tau];
-	stateType xp{0,tau};
-
-	initialCondition[2] = initialCondition[2] + d;
-	std::vector<stateType> u;
-	stateType tt;
-    typedef runge_kutta_cash_karp54<stateType> error_stepper_type;
-    size_t steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
-                   fun, initialCondition, xp[0], xp[1], 0.001,
-                   push_back_state_and_time<stateType>(u, tt));
-    // u save the data column wise, the firts colum has the first state data. It would
-    //be nice to have in row
-    //This create a transpose of u, with dimentions: STATE_SIZE * steps (3 x steps)
-    // with elements equal to zero
-    std::vector < stateType> state(STATE_SIZE, stateType(u.size()));
-    transpose(u,state);
-
-	//!!!! this param shoul exist only on one place not to be repated
-	stateType param = { 1,2.5,0.5,1.5,4.5,1,0.2,0.5 };
-	stateType identityMatrixVector = {1,0,0,0,1,0,0,0,1};
-
-    itikBanksJacobianUt Dfu(param,state,tt);
-
-	steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
-		Dfu, identityMatrixVector, xp[0], xp[1], 0.001);
-
-	// Returns the last matrix since
-	// DF(x) = v(tau).See page 12 research notebook
-	return reshapeVectorToMatrix(identityMatrixVector);
-};
-template <class T>
-Matrix3d DFode_stiff(T &fun, stateType initialCondition,double tau,double d)
-{
-// xp=[0, tau];
-    stateType xp{0,tau};
-
-    initialCondition[2] = initialCondition[2] + d;
-
-    vectorBoost x(STATE_SIZE);
-    std::copy(initialCondition.begin(), initialCondition.end(), x.begin());
-    std::vector<vectorBoost> u;
-    stateType tt;
-
-        //  STIFF INTEGRATION------------------
-    size_t steps = integrate_const( make_dense_output< rosenbrock4< double > >( 1.0e-6 , 1.0e-6 ) ,
-            std::make_pair( fun , fun ) ,
-            x , xp[0] ,xp[1], 0.01, push_back_state_and_time<vectorBoost>(u, tt));
-        //  STIFF INTEGRATION ------------------
-
-    // u save the data column wise, the firts colum has the first state data. It would
-    //be nice to have in row
-    //This create a transpose of u, with dimentions: STATE_SIZE * steps (3 x steps)
-    // with elements equal to zero
-    std::vector < stateType> state(STATE_SIZE, stateType(u.size()));
-    //notice that this also transform the data from vector boost ublas to std vector
-    transpose(u,state);
-
-    //!!!! this param shoul exist only on one place not to be repated
-    stateType param = { 1,2.5,0.5,1.5,4.5,1,0.2,0.5 };
-    stateType identityMatrixVector = {1,0,0,0,1,0,0,0,1};
-
-    itikBanksJacobianUt Dfu(param,state,tt);
-    typedef runge_kutta_cash_karp54<stateType> error_stepper_type;
-    steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
-        Dfu, identityMatrixVector, xp[0], xp[1], 0.001);
-
-    // Returns the last matrix since
-    // DF(x) = v(tau).See page 12 research notebook
-    return reshapeVectorToMatrix(identityMatrixVector);
-};
-
-
 
 
 template <class T>
@@ -119,7 +44,7 @@ fixPoint newtonPoincare(T &fun, stateType initialCondition, double tau, double d
         steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
             fun,                //!@_@
             initialCondition,
-            xp[0], xp[1], 0.001, push_back_state_and_time<stateType>(u, t));
+            xp[0], xp[1], 0.001, push_back_state_and_time(u, t));
         //[t, u] = ode15s(functionName, xp, [Xk(1), Xk(2), Xk(3) + d], [], [parameters d]);
 
         //!@This should be done in a bette wway
@@ -179,30 +104,13 @@ fixPoint newtonPoincare_stiff(T &fun, stateType initialCondition, double tau, do
 
     while (n < maxStep) {                   //!@_@
         df = DFode_stiff(fun, stateType {Xk[0], Xk[1], Xk[2]}, tau, d);  //Jacobian
-        initialCondition[0]=Xk[0];
-        initialCondition[1]=Xk[1];
-        initialCondition[2]=Xk[2];
-        //std::copy(Xk.begin(),Xk.end(),initialCondition.begin());
+		toStdVectorD(Xk, initialCondition);
         initialCondition[CONTROL_POS] = initialCondition[CONTROL_POS] + d;
 
         //  STIFF INTEGRATION simple------------------
         stateType u(STATE_SIZE);
         integrateStiffSystem(fun,initialCondition,u,xp[0],xp[1]);
-//
-//        vectorBoost x(STATE_SIZE);
-//        std::copy(initialCondition.begin(), initialCondition.end(), x.begin());
-//
-//        steps = integrate_const( make_dense_output< rosenbrock4< double > >( 1.0e-6 , 1.0e-6 ) ,
-//            std::make_pair( fun , fun ) ,
-//            x , xp[0] , xp[1] , 0.01);
-//
-//		stateType u(STATE_SIZE);
-//		std::copy(x.begin(), x.end(), u.begin());
-
-        //!@This should be done in a bette wway
-        Pxk[0] = u[0];
-        Pxk[1] = u[1];
-        Pxk[2] = u[2];
+		Pxk = toEigenVector(u);
         //  STIFF INTEGRATION END ------------------
 
         A = df - I;
@@ -230,6 +138,105 @@ fixPoint newtonPoincare_stiff(T &fun, stateType initialCondition, double tau, do
     }
     fixPoint ss(convergence, stability, Xk);
     return ss;
+}
+
+
+//calculate the jacobian DF solving fisrt eq (6)
+template <class T>
+Matrix3d DFode(T &fun, stateType initialCondition, double tau, double d)
+{
+	// xp=[0, tau];
+	stateType xp{ 0,tau };
+
+	initialCondition[2] = initialCondition[2] + d;
+	std::vector<stateType> u;
+	stateType tt;
+	typedef runge_kutta_cash_karp54<stateType> error_stepper_type;
+	size_t steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
+		fun, initialCondition, xp[0], xp[1], 0.001,
+		push_back_state_and_time(u, tt));
+	// u save the data column wise, the firts colum has the first state data. It would
+	//be nice to have in row
+	//This create a transpose of u, with dimentions: STATE_SIZE * steps (3 x steps)
+	// with elements equal to zero
+	std::vector < stateType> state(STATE_SIZE, stateType(u.size()));
+	transpose(u, state);
+
+	//!!!! this param shoul exist only on one place not to be repated
+	stateType identityMatrixVector = { 1,0,0,0,1,0,0,0,1 };
+
+	itikBanksDFu_v Dfu(PARAMETERS, state, tt);
+
+	steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
+		Dfu, identityMatrixVector, xp[0], xp[1], 0.001);
+
+	// Returns the last matrix since
+	// DF(x) = v(tau).See page 12 research notebook
+	return reshapeVectorToMatrix(identityMatrixVector);
+};
+template <class T>
+Matrix3d DFode_stiff(T &fun, stateType initialCondition, double tau, double d)
+{
+	// xp=[0, tau];
+	stateType xp{ 0,tau };
+
+	initialCondition[CONTROL_POS] = initialCondition[CONTROL_POS] + d;
+
+	//  STIFF INTEGRATION------------------
+	//vectorBoost x = toBoostVectorD(initialCondition);
+	std::vector<stateType> u;
+	stateType tt;
+
+
+	integrateStiffSystem(fun, initialCondition, xp[0], xp[1], u, tt);
+	//  STIFF INTEGRATION ------------------
+
+	// u save the data column wise, the firts colum has the first state data. It would
+	//be nice to have in row
+	//This create a transpose of u, with dimentions: STATE_SIZE * steps (3 x steps)
+	// with elements equal to zero
+	std::vector < stateType> state(STATE_SIZE, stateType(u.size()));
+	//we need to transpose because the itikBanksJacobianUt uses 
+	//boost::math::barycentric_rational which need a vector of the data and is easier to
+	//to pass state[0].data() as the data vector of first variable
+	//notice that this also transform the data from vector boost ublas to std vector
+	transpose(u, state);
+
+	//!!!! this param shoul exist only on one place not to be repated
+	stateType identityMatrixVector = { 1,0,0,0,1,0,0,0,1 };
+
+	itikBanksDFu_v Dfu(PARAMETERS, state, tt);
+	typedef runge_kutta_cash_karp54<stateType> error_stepper_type;
+	size_t steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
+		Dfu, identityMatrixVector, xp[0], xp[1], 0.001);
+
+	// Returns the last matrix since
+	// DF(x) = v(tau).See page 12 research notebook
+	return reshapeVectorToMatrix(identityMatrixVector);
+};
+
+//calculate the jacobian receiving the data of eq (6) in Fx
+
+Matrix3d DF(stateType Fx, double tau) {
+
+	//std::vector<stateType> V;
+	//std::vector<double> t;
+	stateType xp = { 0,tau };
+
+	itikBanksJacobian Dfu(PARAMETERS, Fx[0], Fx[1], Fx[2]);
+	typedef runge_kutta_dopri5<stateType> error_stepper_type;
+
+
+	stateType identityMatrixVector = { 1,0,0,0,1,0,0,0,1 };
+	size_t steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
+		Dfu, identityMatrixVector, xp[0], xp[1], 0.001);
+	//push_back_state_and_time(V, t));
+	// Returns the last matrix since
+	// DF(x) = v(tau).See page 12 research notebook
+	// return reshapeVectorToMatrix(V.back());
+	return reshapeVectorToMatrix(identityMatrixVector);
+
+
 }
 
 

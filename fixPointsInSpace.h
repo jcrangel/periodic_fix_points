@@ -139,7 +139,7 @@ void al22(double xi, double xf, double yi, double yf, double zi, double zf,
 	bool signChange = false;
 
 	Matrix3d I3 = Matrix3d::Identity(3, 3);
-	double firstDet = (DFitikBanks(toStdVectorD(Fx[0]), tau) - I3).determinant();
+	double firstDet = (DF(toStdVectorD(Fx[0]), tau) - I3).determinant();
 	n = 0;
 	double Det, mult;
 	for (double i : std::vector<double>{ xi,xf }) {
@@ -152,7 +152,7 @@ void al22(double xi, double xf, double yi, double yf, double zi, double zf,
 					n = n + 1;
 					continue;
 				}
-				Det = (DFitikBanks(toStdVectorD(Fx[n]), tau) - I3).determinant();
+				Det = (DF(toStdVectorD(Fx[n]), tau) - I3).determinant();
 				//Step 4
 				if (DEBUG)
 					std::cout << "step 4" << std::endl;

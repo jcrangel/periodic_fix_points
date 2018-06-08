@@ -14,7 +14,7 @@
 #define CONTROL_POS 2
 #define DEBUG false
 
-const std::vector<double> PARAMETERS = { 1,2.5,0.5,1.5,4.5,1,0.2,0.5 };
+const std::vector<double> PARAMETERS = { 1,2.5,0.2,1.5,4.5,1,0.2,0.5 };
 
 using namespace Eigen;
 using namespace boost::numeric::odeint;
@@ -42,25 +42,6 @@ public:
 };
 //typedef std::vector<fixPoint> fixPoints;
 
-
-
-//[ integrate_observer
-
-template <class T>
-struct push_back_state_and_time
-{
-    std::vector< T >& m_states;
-    std::vector<double> & m_times;
-
-    push_back_state_and_time( std::vector< T > &states, std::vector<double> &times )
-        : m_states( states ), m_times( times ) { }
-
-    void operator()( const T &x, double t )
-    {
-        m_states.push_back( x );
-        m_times.push_back( t );
-    }
-};
 //Transpose a matrix of made with std::vector's
 template <class T>
 void transpose(const T u,
@@ -117,13 +98,38 @@ bool equal(double A, double B, double epsilon = 0.005f)
 {
     return (fabs(A - B) < epsilon);
 }
-
-std::vector<double> toStdVectorD(Vector3d v)
+//get a std vector from eigen Vector3d
+std::vector<double> toStdVectorD(const Vector3d v)
 {
     std::vector<double> v2;
     v2.resize(v.size());
     VectorXd::Map(&v2[0], v.size()) = v;
     return v2;
+}
+//Copy a Vector3d into a std vector
+void toStdVectorD(const Vector3d v, stateType &w)
+{
+	w.resize(v.size());
+	VectorXd::Map(&w[0], v.size()) = v;
+}
+std::vector<double> toStdVectorD(vectorBoost v)
+{
+	std::vector<double> w(v.size());
+	std::copy(v.begin(), v.end(), w.begin());
+	return w;
+}
+
+
+vectorBoost toBoostVectorD(const stateType v)
+{
+	vectorBoost x(v.size());
+	std::copy(v.begin(), v.end(), x.begin());
+	return x;
+}
+
+Vector3d toEigenVector(const stateType v) {
+	Vector3d v2(v.data());
+	return v2;
 }
 
 //Integrate a ODE system and returns the last value of the integration in x
@@ -131,9 +137,9 @@ std::vector<double> toStdVectorD(Vector3d v)
 template <class T>
 void integrateStiffSystem(T &system, stateType initialCondition,stateType &x,double t0,double tf){
 
-	vectorBoost v(STATE_SIZE);
+	vectorBoost v = toBoostVectorD(initialCondition);;
 
-	std::copy(initialCondition.begin(), initialCondition.end(), v.begin());
+	//std::copy(initialCondition.begin(), initialCondition.end(), v.begin());
 
 	size_t num_of_steps = integrate_const(make_dense_output< rosenbrock4< double > >(1.0e-6, 1.0e-6),
 		std::make_pair(system, system),
@@ -144,5 +150,44 @@ void integrateStiffSystem(T &system, stateType initialCondition,stateType &x,dou
 
 }
 
+//Integrate a ODE system and returns the last value of the integration in x
+//In the stiff version the system should be a class that have the Jacobian as a functor
+//save the data into u and t
+template <class T>
+void integrateStiffSystem(T &system, stateType initialCondition,
+	 double t0, double tf, std::vector<stateType> &u, stateType &t) {
+
+	vectorBoost v = toBoostVectorD(initialCondition);
+
+	//std::copy(initialCondition.begin(), initialCondition.end(), v.begin());
+
+	size_t num_of_steps = integrate_const(make_dense_output< rosenbrock4< double > >(1.0e-6, 1.0e-6),
+		std::make_pair(system, system),
+		v, t0, tf, 0.01, push_back_state_and_time(u, t));
+
+}
+
+
+//[ integrate_observer
+struct push_back_state_and_time
+{
+	std::vector< stateType>& m_states;
+	std::vector<double> & m_times;
+
+	push_back_state_and_time(std::vector< stateType > &states, std::vector<double> &times)
+		: m_states(states), m_times(times) { }
+
+	void operator()(const stateType &x, double t)
+	{
+		m_states.push_back(x);
+		m_times.push_back(t);
+	}
+
+	void operator()(const vectorBoost &x, double t)
+	{
+		m_states.push_back(toStdVectorD(x));
+		m_times.push_back(t);
+	}
+};
 
 #endif

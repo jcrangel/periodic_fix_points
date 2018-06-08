@@ -15,6 +15,14 @@ Note:
  -Why to disthinguis beetween std::vector and boost::vector how about just use boost vector
   for everything
 
+  Why is not working?
+  -- DFode and DF, DF calculates the jacobian only using the last data. I can't find any reference were 
+		this should be done like that
+	--%algorithm 2.2 line 88 step1
+		
+
+
+
 */
 
 //#include "all.h"
@@ -27,7 +35,7 @@ Note:
 int main(){
 
 	std::vector<fixPoint> S;
-		itikBanks_stiff fun(PARAMETERS);
+		itikBanks fun(PARAMETERS);
 		S = al21(0.1, 0.1, 0.1, 2, 2, 2, fun, 10, 0.5);
 
 	for (fixPoint i : S) {

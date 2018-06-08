@@ -12,7 +12,7 @@
 #include <iostream>
 #include <fstream>
 #include <utility>
-
+#include "all.h"
 #include <boost/numeric/odeint.hpp>
 
 #include <boost/phoenix/core.hpp>
@@ -55,20 +55,27 @@ struct stiff_system_jacobi
 };
 //]
 
-template <class T>
-struct push_back_state_and_time
+//template <class T>
+struct push_back_state_and_time2
 {
-    std::vector< T >& m_states;
+    std::vector< std::vector<double> >& m_states;
     std::vector<double> & m_times;
 
-    push_back_state_and_time( std::vector< T > &states, std::vector<double> &times )
+    push_back_state_and_time2( std::vector< std::vector<double> > &states, std::vector<double> &times )
         : m_states( states ), m_times( times ) { }
 
-    void operator()( const T &x, double t )
+    void operator()( const std::vector<double> &x, double t )
     {
         m_states.push_back( x );
         m_times.push_back( t );
     }
+	void operator()(const vector_type &x, double t)
+	{
+		//std::vector<double> v(x.size());
+		//std::copy(x.begin(), x.end(), v.begin());
+		m_states.push_back(toStdVectorD(x));
+		m_times.push_back(t);
+	}
 };
 
 
@@ -108,11 +115,11 @@ int main( int argc , char **argv )
     vector_type x( 2);
     x[0]=7;
     x[1]=-3;
-    std::vector<vector_type> u;
+    std::vector<std::vector<double>> u;
     std::vector<double> tt;
     size_t num_of_steps = integrate_const( make_dense_output< rosenbrock4< double > >( 1.0e-6 , 1.0e-6 ) ,
             make_pair( stiff_system() , stiff_system_jacobi() ) ,
-            x , 0.0 , 50.0 , 0.01, push_back_state_and_time<vector_type>(u, tt));
+            x , 0.0 , 50.0 , 0.01, push_back_state_and_time2(u, tt));
     //]
     //clog << num_of_steps << end;
     for( size_t i=0; i<= tt.size() - 1 ; i++ )
@@ -122,7 +129,7 @@ int main( int argc , char **argv )
     clog << x(0) << " " << x(1)<< endl;
 
 
-
+	cin.get();
 //    typedef runge_kutta_dopri5< vector_type > dopri5_type;
 //    typedef controlled_runge_kutta< dopri5_type > controlled_dopri5_type;
 //    typedef dense_output_runge_kutta< controlled_dopri5_type > dense_output_dopri5_type;
@@ -136,6 +143,6 @@ int main( int argc , char **argv )
    //]
    clog << num_of_steps2 << endl;
    clog << x2(0) << " " << x2(1)<< endl;
-
+   cin.get();
     return 0;
 }
