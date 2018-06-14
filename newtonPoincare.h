@@ -8,75 +8,59 @@
 
 template <class T>
 fixPoint newtonPoincare(T &fun, stateType initialCondition, double tau, double d) {
-    int n = 0;            //%initialize iteration counter
-    double eps = 1;          //%initialize error
+	int n = 0;            //%initialize iteration counter
+	double eps = 1;          //%initialize error
 	stateType xp{ 0, tau }; //% define the span of the computational domain
-    double tol = 1e-6;
-    int maxStep = 100;
+	double tol = 1e-6;
+	int maxStep = 100;
 
-    Vector3d Xk(initialCondition.data());
-    Vector3d Pxk;
-    Matrix3d df;
-    std::vector<stateType> u;
-	stateType t;
-    Matrix3d A;
-    Matrix3d I = Matrix3d::Identity();
-    Vector3d y;
-    Vector3d Xplus;
-    size_t steps;
-    typedef runge_kutta_cash_karp54<stateType> error_stepper_type;
+	Vector3d Xk(initialCondition.data());
+	Vector3d Pxk;
+	Matrix3d df;
+	Matrix3d A;
+	Matrix3d I = Matrix3d::Identity();
+	Vector3d y;
+	Vector3d Xplus;
+	size_t steps;
 
-    //stateType initCond;
-   // stateType XkStd(STATE_SIZE);
+	//stateType initCond;
 
-    while (n < maxStep) {                   //!@_@
-        df = DFode_stiff(fun, stateType {Xk[0], Xk[1], Xk[2]}, tau, d);  //Jacobian
-        initialCondition[0]=Xk[0];
-        initialCondition[1]=Xk[1];
-        initialCondition[2]=Xk[2];
-         //std::copy(Xk.begin(),Xk.end(),initialCondition.begin());
-        initialCondition[CONTROL_POS] = initialCondition[CONTROL_POS] + d;
+	while (n < maxStep) {                   //!@_@
+		df = DFode_aprox(fun, stateType{ Xk[0], Xk[1], Xk[2] }, tau, d);  //Jacobian
+		toStdVectorD(Xk, initialCondition);
+		initialCondition[CONTROL_POS] = initialCondition[CONTROL_POS] + d;
 
-        //std::copy(Xk.begin(),Xk.end(),initialCondition.begin());
+		//  STIFF INTEGRATION simple------------------
+		stateType u(STATE_SIZE);
+		integrateSystem(fun, initialCondition, u, xp[0], xp[1]);
+		Pxk = toEigenVector(u);
+		//  STIFF INTEGRATION END ------------------
 
+		A = df - I;
+		//Solve Ay = (Pxk-Xk)
+		y = A.colPivHouseholderQr().solve(Pxk - Xk);
+		Xplus = Xk - y;
 
+		eps = y.norm();
+		if (eps < tol)
+			break;
 
-        steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
-            fun,                //!@_@
-            initialCondition,
-            xp[0], xp[1], 0.001, push_back_state_and_time(u, t));
-        //[t, u] = ode15s(functionName, xp, [Xk(1), Xk(2), Xk(3) + d], [], [parameters d]);
+		Xk = Xplus;  //%update x
+		n++;
 
-        //!@This should be done in a bette wway
-        Pxk[0] = u.back()[0];
-        Pxk[1] = u.back()[1];
-        Pxk[2] = u.back()[2];
+	}
+	// 0 means unstable
+	double stability = 0;
+	bool convergence = false;
+	if (n < maxStep) {
+		convergence = true;
 
-        A = df - I;
-        //Solve Ay = (Pxk-Xk)
-        y = A.colPivHouseholderQr().solve(Pxk-Xk);
-        Xplus = Xk - y;
+		if (isStable(df))
+			stability = 1;
 
-        eps = y.norm();
-        if (eps < tol)
-            break;
-
-        Xk = Xplus;  //%update x
-        n++;
-
-    }
-    // 0 means unstable
-    double stability = 0;
-    bool convergence = false;
-    if (n < maxStep){
-        convergence = true;
-
-        if (isStable(df))
-            stability = 1;
-
-    }
-    fixPoint ss(convergence, stability, Xk);
-    return ss;
+	}
+	fixPoint ss(convergence, stability, Xk);
+	return ss;
 }
 
 
@@ -103,7 +87,7 @@ fixPoint newtonPoincare_stiff(T &fun, stateType initialCondition, double tau, do
     //stateType initCond;
 
     while (n < maxStep) {                   //!@_@
-        df = DFode_stiff(fun, stateType {Xk[0], Xk[1], Xk[2]}, tau, d);  //Jacobian
+        df = DFode_aprox(fun, stateType {Xk[0], Xk[1], Xk[2]}, tau, d);  //Jacobian
 		toStdVectorD(Xk, initialCondition);
         initialCondition[CONTROL_POS] = initialCondition[CONTROL_POS] + d;
 
@@ -215,29 +199,58 @@ Matrix3d DFode_stiff(T &fun, stateType initialCondition, double tau, double d)
 	return reshapeVectorToMatrix(identityMatrixVector);
 };
 
+//Calculate the jacobian of the poincare map given by equations (6) & (7)
+template <class T>
+Matrix3d DFode_aprox(T &fun, stateType initialCondition,
+	double tau, double d)
+{
+	const double EPS = 1.0e-8;
+	int n = initialCondition.size();
+	Matrix3d df/*(n,n)*/;
+	stateType xh = initialCondition;
+	Vector3d fvec = evalFunInLast(fun, initialCondition, tau, d);
+
+
+	for (int j = 0; j<n; j++)
+	{
+		double temp = xh[j];
+		double h = EPS * abs(temp);
+		if (h == 0.0) h = EPS;
+		xh[j] = temp + h;
+		h = xh[j] - temp;
+		//stateType f=func(xh);
+		Vector3d f = evalFunInLast(fun, xh, tau, d);
+		xh[j] = temp;
+		for (int i = 0; i<n; i++)
+			df(i, j) = (f[i] - fvec[i]) / h;
+	}
+	return df;
+};
+
+
 //calculate the jacobian receiving the data of eq (6) in Fx
-
-Matrix3d DF(stateType Fx, double tau) {
-
-	//std::vector<stateType> V;
-	//std::vector<double> t;
-	stateType xp = { 0,tau };
-
-	itikBanksJacobian Dfu(PARAMETERS, Fx[0], Fx[1], Fx[2]);
-	typedef runge_kutta_dopri5<stateType> error_stepper_type;
-
-
-	stateType identityMatrixVector = { 1,0,0,0,1,0,0,0,1 };
-	size_t steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
-		Dfu, identityMatrixVector, xp[0], xp[1], 0.001);
-	//push_back_state_and_time(V, t));
-	// Returns the last matrix since
-	// DF(x) = v(tau).See page 12 research notebook
-	// return reshapeVectorToMatrix(V.back());
-	return reshapeVectorToMatrix(identityMatrixVector);
-
-
-}
+//
+//Matrix3d DF(stateType Fx, double tau) {
+//
+//	//std::vector<stateType> V;
+//	//std::vector<double> t;
+//	stateType xp = { 0,tau };
+//
+//	itikBanksJacobian Dfu(PARAMETERS, Fx[0], Fx[1], Fx[2]);
+//	typedef runge_kutta_dopri5<stateType> error_stepper_type;
+//
+//
+//	stateType identityMatrixVector = { 1,0,0,0,1,0,0,0,1 };
+//	size_t steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
+//		Dfu, identityMatrixVector, xp[0], xp[1], 0.001);
+//	//push_back_state_and_time(V, t));
+//	// Returns the last matrix since
+//	// DF(x) = v(tau).See page 12 research notebook
+//	// return reshapeVectorToMatrix(V.back());
+//	return reshapeVectorToMatrix(identityMatrixVector);
+//
+//
+//}
 
 
 

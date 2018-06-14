@@ -208,6 +208,15 @@ struct itikBanksJacobian
 // Receive the function in row mayor order, and then return it has a matrix
 
 
+//How to read paramters for this functon 
+std::vector<double> readParameters() {
+	int numParam = 8;
+	std::vector<double> param(numParam);
+	for (double &i : param)
+		std::cin >> i;
+	return param;
+}
+
 
 
 #endif

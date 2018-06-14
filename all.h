@@ -12,9 +12,12 @@
 
 #define STATE_SIZE 3
 #define CONTROL_POS 2
-#define DEBUG false
+#define DEBUG0 true
+#define DEBUG1 false
 
-const std::vector<double> PARAMETERS = { 1,2.5,0.2,1.5,4.5,1,0.2,0.5 };
+//const std::vector<double> PARAMETERS = { 1,2.5,0.5,1.5,4.5,1,0.2,0.5 };
+//This should not be global
+//std::vector<double> PARAMETERS;
 
 using namespace Eigen;
 using namespace boost::numeric::odeint;
@@ -94,7 +97,7 @@ bool isStable(MatrixXd A)
 
 
 //Cheking for equality,
-bool equal(double A, double B, double epsilon = 0.005f)
+bool equal(double A, double B, double epsilon = 0.000005f)
 {
     return (fabs(A - B) < epsilon);
 }
@@ -130,6 +133,19 @@ vectorBoost toBoostVectorD(const stateType v)
 Vector3d toEigenVector(const stateType v) {
 	Vector3d v2(v.data());
 	return v2;
+}
+//Integrate a ODE system and returns the last value of the integration in x
+//In the stiff version the system should be a class that have the Jacobian as a functor
+template <class T>
+void integrateSystem(T &system, stateType initialCondition, stateType &x, double t0, double tf) {
+
+		typedef runge_kutta_dopri5<stateType> error_stepper_type;
+	
+		size_t steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
+		system, initialCondition, t0, tf, 0.001);
+		x = initialCondition;
+
+
 }
 
 //Integrate a ODE system and returns the last value of the integration in x
@@ -190,4 +206,29 @@ struct push_back_state_and_time
 	}
 };
 
+
+bool pointIsInSet(fixPoint p, std::vector<fixPoint> S)
+{
+	for (fixPoint i: S) {
+		//Check 
+		int j;
+		for (j = 0; j < STATE_SIZE; j++) {
+			
+			if ( !equal(i.solution[j],p.solution[j]) )
+				break;	//Stop comparing, vectors ain't equal
+		}
+		if (j == STATE_SIZE) // never break, then all were equal
+			return true;
+
+	}
+	return false;
+}
+
+bool pointHaveNegatives(fixPoint p) {
+	for (int i = 0; i < p.solution.size(); i++)
+		if (p.solution[i] < 0)
+			return true;
+
+	return false;
+}
 #endif

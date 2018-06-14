@@ -11,15 +11,16 @@ That is the algorithms 2.1 and 2.2 of Wei 2014
 
 //Return a set(vector) of fixed points
 template <class T>
-std::vector<fixPoint> al21(double xmax, double ymax, double zmax, double M, double N, double L, T &functionName, double tau, double d)
+std::vector<fixPoint> al21(double xmin, double xmax, double ymin, double ymax,
+	double zmin,double zmax, double M, double N, double L, T &functionName, double tau, double d)
 {
 	std::vector<fixPoint> S;
 	double xstep = xmax / M;
 	double ystep = ymax / N;
 	double zstep = zmax / L;
-	double xmin = 0;
-	double ymin = 0;
-	double zmin = 0;
+	//double xmin = 0;
+	//double ymin = 0;
+	//double zmin = 0;
 
 	std::vector<fixPoint> temp;
 
@@ -27,13 +28,19 @@ std::vector<fixPoint> al21(double xmax, double ymax, double zmax, double M, doub
 //vector1.insert( vector1.end(), vector2.begin(), vector2.end() );
 
 	double i, j, k;
-	for (i = xmin; i <= xmax; i += xstep)
-		for (j = ymin; j <= ymax; j += ystep)
-			for ( k = zmin; k <= zmax; k += zstep)
+	for (i = xmin; i < xmax; i += xstep)
+		for (j = ymin; j < ymax; j += ystep)
+			for ( k = zmin; k < zmax; k += zstep)// with M = 10 , k goes up to 0.9999999999999
 			{
 				//Since where pasing S as a reference, each al22 modify S. If we want parallelism S must be
 				//part of a reduction or something
-				al22(i, i + xstep, j, j + ystep, k, k + zstep, S,functionName, tau, d, 6) ;
+				if (DEBUG0) {
+					std::cout << "Searching on:\n" << "x = [" << i << "," << i + xstep << "]\n"
+						<< "y = [" << j << "," << j + ystep << "]\n"
+						<< "z = [" << k << "," << k + xstep << "]\n";
+				}
+				al22(i, i + xstep, j, j + ystep, k, k + zstep, S,functionName, tau, d, 1) ;
+				if (DEBUG0) std::cout << "END searching on subspace" << std::endl;
                 //S.insert(S.end(),temp.begin(),temp.end());
 			}
 	return S;
@@ -46,7 +53,7 @@ Vector3d evalFunInLast(T &functionName, stateType initialCondition, double tau, 
     initialCondition[CONTROL_POS] = initialCondition[CONTROL_POS] + d;
 
 		std::vector<double> res(STATE_SIZE);
-		integrateStiffSystem(functionName,initialCondition,res,0,tau);
+		integrateSystem(functionName,initialCondition,res,0,tau);
 
 		Vector3d v(res.data());
 		return v;
@@ -63,10 +70,13 @@ struct pointxyz
 };
 
 
+
 template <class T>
 void al22(double xi, double xf, double yi, double yf, double zi, double zf,
 	std::vector<fixPoint> &S, T &functionName, double tau, double d, int deepness)
 {
+	if(DEBUG1)
+		std::cout << deepness << std::endl;
 
 	if (deepness <= 0)
 		return ;
@@ -85,11 +95,14 @@ void al22(double xi, double xf, double yi, double yf, double zi, double zf,
 	double mulx;
 	double muly;
 	double mulz;
+	double xm = (xf + xi) / 2;
+	double ym = (yf + yi) / 2;
+	double zm = (zf + zi) / 2;
 	//%this is wrong we need to evalute this on the middle points see algorithm
 	//%2.2 step1
-	for (double i : std::vector<double>{ xi,xf })
-		for (double j : std::vector<double>{ yi,yf })
-			for (double k : std::vector<double>{ zi,zf })
+	for (double i : std::vector<double>{ xi,xm,xf })
+		for (double j : std::vector<double>{ yi,xm,yf })
+			for (double k : std::vector<double>{ zi,xm,zf })
 			{
 				//The first element is already computed
 				if (n == 0)
@@ -98,16 +111,16 @@ void al22(double xi, double xf, double yi, double yf, double zi, double zf,
 					continue;
 				}
 
-				if (DEBUG) {
+				if (DEBUG1) {
 					std::cout << "Step 1" << std::endl;
 				}
 
 				//Step1
-				Fx.push_back(evalFunInLast(functionName, std::vector<double> {xi, yi, zi}, tau, d));
+				Fx.push_back(evalFunInLast(functionName, std::vector<double> {i, j, k}, tau, d));
 				//Not effice to create every loop?   //#_#
-				pointxyz fminus(Fx[n][0] - xi, Fx[n][1] - yi, Fx[n][2] - zi);
+				pointxyz fminus(Fx[n][0] - i, Fx[n][1] - j, Fx[n][2] - k);
 
-				if (DEBUG) {
+				if (DEBUG1) {
 					std::cout << "Step 2" << std::endl;
 				}
 				//            %Step 2 Check if first.x  differs at sign with fminus.x
@@ -133,18 +146,19 @@ void al22(double xi, double xf, double yi, double yf, double zi, double zf,
 	if (!(xgood && ygood && zgood))
 		return ;
 
-	if (DEBUG) {
+	if (DEBUG1) {
 		std::cout << "Step 3" << std::endl;
 	}
 	bool signChange = false;
 
 	Matrix3d I3 = Matrix3d::Identity(3, 3);
-	double firstDet = (DF(toStdVectorD(Fx[0]), tau) - I3).determinant();
+	//Here we could use the F(xi,yi,zi) calculated on step2
+	double firstDet = (DFode_aprox(functionName, stateType{xi,yi,zi}, tau,d) - I3).determinant();
 	n = 0;
 	double Det, mult;
-	for (double i : std::vector<double>{ xi,xf }) {
-		for (double j : std::vector<double>{ yi,yf }) {
-			for (double k : std::vector<double>{ zi,zf })
+	for (double i : std::vector<double>{ xi,xm,xf }) {
+		for (double j : std::vector<double>{ yi,xm,yf }) {
+			for (double k : std::vector<double>{ zi,xm,zf })
 			{
 				//The first element is already computed
 				if (n == 0)
@@ -152,9 +166,10 @@ void al22(double xi, double xf, double yi, double yf, double zi, double zf,
 					n = n + 1;
 					continue;
 				}
-				Det = (DF(toStdVectorD(Fx[n]), tau) - I3).determinant();
+				//Det = (DF(toStdVectorD(Fx[n]), tau) - I3).determinant();
+				Det = (DFode_aprox(functionName, stateType{ i,j,k }, tau, d) - I3).determinant();
 				//Step 4
-				if (DEBUG)
+				if (DEBUG1)
 					std::cout << "step 4" << std::endl;
 
 				mult = Det * firstDet;
@@ -175,14 +190,12 @@ void al22(double xi, double xf, double yi, double yf, double zi, double zf,
 			break;
 	}
 
-	double xm = (xf + xi) / 2;
-	double ym = (yf + yi) / 2;
-	double zm = (zf + zi) / 2;
+
 
 
 	if (signChange) {
-		//%Do step 5;
-		//%disp('step 5')
+		if (DEBUG1)
+			std::cout << "step 5" << std::endl;
 		//% cut at half
 
 		std::vector<double> X = { xi, xm, xf };
@@ -190,9 +203,9 @@ void al22(double xi, double xf, double yi, double yf, double zi, double zf,
 		std::vector<double> Z = { zi, zm, zf };
 
         std::vector<fixPoint> temp;
-		for (int i = 0; i < STATE_SIZE; ++i)
-			for (int j = 0; j < STATE_SIZE; ++j)
-				for (int k = 0; k < STATE_SIZE; ++k) {
+		for (int i = 0; i < STATE_SIZE - 1; ++i)
+			for (int j = 0; j < STATE_SIZE - 1; ++j)
+				for (int k = 0; k < STATE_SIZE - 1; ++k) {
 					 al22(X[i], X[i + 1], Y[j], Y[j + 1], Z[k], Z[k + 1], S,
 						functionName, tau, d, deepness - 1);
 					 //S.insert(S.end(),temp.begin(),temp.end());
@@ -209,9 +222,16 @@ void al22(double xi, double xf, double yi, double yf, double zi, double zf,
 		for (double j : std::vector<double>{ yi, ym, yf })
 			for (double k : std::vector<double>{ zi, zm, zf }) {
 
-				fixPoint fixPt = newtonPoincare_stiff(functionName, stateType{ i,j,k }, tau, d);
+				fixPoint fixPt = newtonPoincare(functionName, stateType{ i,j,k }, tau, d);
 				if (fixPt.convergent) {
+					//If have negatives dont insert it , sometime wild -0 appear
+					// is always true than -0 < 0 is false? 
+					if (pointHaveNegatives(fixPt)) 
+						goto END;
+
+					if ( !pointIsInSet(fixPt, S) ) //
 					S.push_back(fixPt);
+
 					goto END; //Yes, a goto
 				}
 			}
