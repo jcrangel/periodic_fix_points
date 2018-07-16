@@ -67,6 +67,8 @@ struct pointxyz
 	double z;
 	pointxyz(double x_, double y_, double z_) :
 		x(x_), y(y_), z(z_) {}
+
+
 };
 
 
@@ -225,8 +227,8 @@ void al22(double xi, double xf, double yi, double yf, double zi, double zf,
 				fixPoint fixPt = newtonPoincare(functionName, stateType{ i,j,k }, tau, d);
 				if (fixPt.convergent) {
 					//If have negatives dont insert it , sometime wild -0 appear
-					// is always true than -0 < 0 is false? 
-					if (pointHaveNegatives(fixPt)) 
+					// is always true than -0 < 0 is false?
+					if (pointHaveNegatives(fixPt))
 						goto END;
 
 					if ( !pointIsInSet(fixPt, S) ) //

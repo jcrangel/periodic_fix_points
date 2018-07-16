@@ -16,10 +16,10 @@ Note:
   for everything
 
   Why is not working?
-  -- DFode and DF, DF calculates the jacobian only using the last data. I can't find any reference were 
+  -- DFode and DF, DF calculates the jacobian only using the last data. I can't find any reference were
 		this should be done like that
 	--%algorithm 2.2 line 88 step1
-		
+
 
 
 
@@ -32,8 +32,8 @@ Note:
 #include <fstream>
 #include <iomanip>
 //typedef std::vector<fixPoint> fixPoints;
+extern std::vector<double> PARAMETERS;
 int main(){
-
 
 		double xmin; double xmax;
 		double ymin; double ymax;
@@ -43,13 +43,14 @@ int main(){
 		std::cin >> ymin >> ymax;
 		std::cin >> zmin >> zmax;
 		std::cin >> M;
-		
+
 		// { 1,2.5,0.5,1.5,4.5,1,0.2,0.5 }
 		std::vector<double> PARAMETERS = readParameters();
 		double tau, d;
 		std::cin >> tau>> d;
 		itikBanks fun(PARAMETERS);
 		std::vector<fixPoint> S;
+
 
 		S = al21(xmin,xmax,ymin,ymax,zmin,zmax,M,M,M, fun, tau, d);
 		std::ofstream points("points.txt",std::ios::out | std::ios::trunc);

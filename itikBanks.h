@@ -16,6 +16,7 @@ struct itikBanks
 	double a12, a21, a13, a31;
     double r2, r3, d3, k3;
 
+
     itikBanks(std::vector<double> parameters)
     {
         a12 = parameters[0];

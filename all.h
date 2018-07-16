@@ -43,6 +43,7 @@ public:
         solution(solution_) {}
 
 };
+
 //typedef std::vector<fixPoint> fixPoints;
 
 //Transpose a matrix of made with std::vector's
@@ -134,13 +135,37 @@ Vector3d toEigenVector(const stateType v) {
 	Vector3d v2(v.data());
 	return v2;
 }
+
+
+//[ integrate_observer
+struct push_back_state_and_time
+{
+	std::vector< stateType>& m_states;
+	std::vector<double> & m_times;
+
+	push_back_state_and_time(std::vector< stateType > &states, std::vector<double> &times)
+		: m_states(states), m_times(times) { }
+
+	void operator()(const stateType &x, double t)
+	{
+		m_states.push_back(x);
+		m_times.push_back(t);
+	}
+
+	void operator()(const vectorBoost &x, double t)
+	{
+		m_states.push_back(toStdVectorD(x));
+		m_times.push_back(t);
+	}
+};
+
 //Integrate a ODE system and returns the last value of the integration in x
 //In the stiff version the system should be a class that have the Jacobian as a functor
 template <class T>
 void integrateSystem(T &system, stateType initialCondition, stateType &x, double t0, double tf) {
 
 		typedef runge_kutta_dopri5<stateType> error_stepper_type;
-	
+
 		size_t steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
 		system, initialCondition, t0, tf, 0.001);
 		x = initialCondition;
@@ -184,36 +209,16 @@ void integrateStiffSystem(T &system, stateType initialCondition,
 }
 
 
-//[ integrate_observer
-struct push_back_state_and_time
-{
-	std::vector< stateType>& m_states;
-	std::vector<double> & m_times;
 
-	push_back_state_and_time(std::vector< stateType > &states, std::vector<double> &times)
-		: m_states(states), m_times(times) { }
-
-	void operator()(const stateType &x, double t)
-	{
-		m_states.push_back(x);
-		m_times.push_back(t);
-	}
-
-	void operator()(const vectorBoost &x, double t)
-	{
-		m_states.push_back(toStdVectorD(x));
-		m_times.push_back(t);
-	}
-};
 
 
 bool pointIsInSet(fixPoint p, std::vector<fixPoint> S)
 {
 	for (fixPoint i: S) {
-		//Check 
+		//Check
 		int j;
 		for (j = 0; j < STATE_SIZE; j++) {
-			
+
 			if ( !equal(i.solution[j],p.solution[j]) )
 				break;	//Stop comparing, vectors ain't equal
 		}
