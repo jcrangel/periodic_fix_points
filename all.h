@@ -2,6 +2,7 @@
 #define ALL_H
 
 #include <iostream>
+#include <fstream>
 #include <cmath>
 //Boosst lib
 #include <boost/numeric/ublas/matrix.hpp>
@@ -236,4 +237,30 @@ bool pointHaveNegatives(fixPoint p) {
 
 	return false;
 }
+/*
+Warper for writing both to the console and to a file.
+
+work only for one << at time
+TODO: this dont work with std::endl
+*/
+
+class LogAndStdout {
+private:
+	std::ofstream file;
+public:
+
+	LogAndStdout(const std::string fileName) {
+		file.open(fileName.c_str(), std::ofstream::out | std::ofstream::app);
+	}
+
+	template<class T>
+	LogAndStdout& operator<<(const T data) {
+		std::cout << data;
+		file << data;
+
+		return *this; // TODO : This clone the object? if this is true, then this is bad 
+	}
+};
+
+
 #endif
