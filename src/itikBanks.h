@@ -1,11 +1,15 @@
+/*
+//Itikbanks model from Wei2014
+*/
+
+
+
 #ifndef ITIKBANKS_H
 #define ITIKBANKS_H
 
 
-#include "all.h"
+#include "util.h"
 
-
-//Itikbanks model from Wei2014
 
 
 struct itikBanks

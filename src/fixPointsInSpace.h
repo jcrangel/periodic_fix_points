@@ -6,7 +6,9 @@ That is the algorithms 2.1 and 2.2 of Wei 2014
 #ifndef FIXPOINTSINSPACE_H
 #define FIXPOINTSINSPACE_H
 
-#include "all.h"
+#include "util.h"
+#include "integrationode.h"
+#include "newtonpoincare.h"
 
 
 //Return a set(vector) of fixed points
@@ -46,20 +48,7 @@ std::vector<fixPoint> al21(double xmin, double xmax, double ymin, double ymax,
 	return S;
 }
 
-//%Evaluate F(x,y,z)
-template <class T>
-Vector3d evalFunInLast(T &functionName, stateType initialCondition, double tau, double d)
-{
-    initialCondition[CONTROL_POS] = initialCondition[CONTROL_POS] + d;
-
-		std::vector<double> res(STATE_SIZE);
-		integrateSystem(functionName,initialCondition,res,0,tau);
-
-		Vector3d v(res.data());
-		return v;
-	//initialCondition has the last
-}
-
+//For saving a point on the space [x,y,z] 
 struct pointxyz
 {
 	double x;

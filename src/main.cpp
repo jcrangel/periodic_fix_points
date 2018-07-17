@@ -1,10 +1,7 @@
 /*
-To do:
-1. Define StateTye as Vector3d so is congruent with all the program.
+TODO:1. Define StateType as Vector3d so is congruent with all the program.
     -- Create a function that integrate inside use std::vector outside return Vector3d
     --
-2. Theres lots code chucks were a ode is solve it, but only the last value is needed. And save all
-the state values is unnecesary
 
 Symbols:
         #_# means that part of the should be rewritten to support systems of several size
@@ -24,7 +21,7 @@ Note:
 
 
 */
-#include "al21Manager.h"
+#include "al21manager.h"
 
 //#include "all.h"
 //typedef std::vector<fixPoint> fixPoints;

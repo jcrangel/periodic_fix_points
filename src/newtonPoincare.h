@@ -1,11 +1,18 @@
+/*
+Procedures to obtain the jacobian following the procedure in eq (6)&(7) of the
+//paper Wei 2014
+*/
+
 #ifndef NEWTONPOINCARE_H
 #define NEWTONPOINCARE_H
 
-#include "all.h"
+#include "util.h"
+#include "integrationode.h"
+
+
+
 //Gets the jacobian following the procedure in eq (6)&(7) of the
 //paper Wei 2014
-
-
 template <class T>
 fixPoint newtonPoincare(T &fun, stateType initialCondition, double tau, double d) {
 	int n = 0;            //%initialize iteration counter
@@ -251,7 +258,6 @@ Matrix3d DFode_aprox(T &fun, stateType initialCondition,
 //
 //
 //}
-
 
 
 

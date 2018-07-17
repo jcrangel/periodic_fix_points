@@ -1,9 +1,22 @@
+/*
+Util.h
+
+TODO: All common headers, google styles says this is not good
+
+Common data type definition and functions for vector manipulation.
+
+*/
+
+
 #ifndef ALL_H
 #define ALL_H
+
+
 
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <vector>
 //Boosst lib
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
@@ -25,12 +38,15 @@ using namespace boost::numeric::odeint;
 
 //An array [x1(t),x2(t),x3(t)]
 //typedef std::array< double, STATE_SIZE > stateType;
+
 typedef std::vector< double > stateType;
 typedef boost::numeric::ublas::vector< double > vectorBoost;
 typedef boost::numeric::ublas::matrix< double > matrixBoost;
 
 
-//The class represents eigenvector
+
+//The class representing a fixpoint [x,y,z] and if info about 
+//convergence and stability
 class fixPoint
 {
 public:
@@ -67,7 +83,8 @@ void transpose(const T u,
 //Reshape a vector Size N^2 into a Matrix NxN,
 //vector is assumed to come in row order
 
-Matrix3d reshapeVectorToMatrix(const stateType x)
+template <class T>
+Matrix3d reshapeVectorToMatrix(const T x)
 {
 
     int N = sqrt(x.size());
@@ -138,81 +155,8 @@ Vector3d toEigenVector(const stateType v) {
 }
 
 
-//[ integrate_observer
-struct push_back_state_and_time
-{
-	std::vector< stateType>& m_states;
-	std::vector<double> & m_times;
 
-	push_back_state_and_time(std::vector< stateType > &states, std::vector<double> &times)
-		: m_states(states), m_times(times) { }
-
-	void operator()(const stateType &x, double t)
-	{
-		m_states.push_back(x);
-		m_times.push_back(t);
-	}
-
-	void operator()(const vectorBoost &x, double t)
-	{
-		m_states.push_back(toStdVectorD(x));
-		m_times.push_back(t);
-	}
-};
-
-//Integrate a ODE system and returns the last value of the integration in x
-//In the stiff version the system should be a class that have the Jacobian as a functor
-template <class T>
-void integrateSystem(T &system, stateType initialCondition, stateType &x, double t0, double tf) {
-
-		typedef runge_kutta_dopri5<stateType> error_stepper_type;
-
-		size_t steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
-		system, initialCondition, t0, tf, 0.001);
-		x = initialCondition;
-
-
-}
-
-//Integrate a ODE system and returns the last value of the integration in x
-//In the stiff version the system should be a class that have the Jacobian as a functor
-template <class T>
-void integrateStiffSystem(T &system, stateType initialCondition,stateType &x,double t0,double tf){
-
-	vectorBoost v = toBoostVectorD(initialCondition);;
-
-	//std::copy(initialCondition.begin(), initialCondition.end(), v.begin());
-
-	size_t num_of_steps = integrate_const(make_dense_output< rosenbrock4< double > >(1.0e-6, 1.0e-6),
-		std::make_pair(system, system),
-		v, t0, tf, 0.01);
-
-		//std::vector<double> res(STATE_SIZE);
-		std::copy(v.begin(), v.end(), x.begin());
-
-}
-
-//Integrate a ODE system and returns the last value of the integration in x
-//In the stiff version the system should be a class that have the Jacobian as a functor
-//save the data into u and t
-template <class T>
-void integrateStiffSystem(T &system, stateType initialCondition,
-	 double t0, double tf, std::vector<stateType> &u, stateType &t) {
-
-	vectorBoost v = toBoostVectorD(initialCondition);
-
-	//std::copy(initialCondition.begin(), initialCondition.end(), v.begin());
-
-	size_t num_of_steps = integrate_const(make_dense_output< rosenbrock4< double > >(1.0e-6, 1.0e-6),
-		std::make_pair(system, system),
-		v, t0, tf, 0.01, push_back_state_and_time(u, t));
-
-}
-
-
-
-
-
+// Check if the fixpoint is in the Set S 
 bool pointIsInSet(fixPoint p, std::vector<fixPoint> S)
 {
 	for (fixPoint i: S) {
@@ -237,13 +181,13 @@ bool pointHaveNegatives(fixPoint p) {
 
 	return false;
 }
+
 /*
 Warper for writing both to the console and to a file.
 
 work only for one << at time
 TODO: this dont work with std::endl
 */
-
 class LogAndStdout {
 private:
 	std::ofstream file;
@@ -261,6 +205,21 @@ public:
 		return *this; // TODO : This clone the object? if this is true, then this is bad 
 	}
 };
+
+
+//%Evaluate F(x,y,z)  at the final time.  
+template <class T>
+Vector3d evalFunInLast(T &functionName, stateType initialCondition, double tau, double d)
+{
+	initialCondition[CONTROL_POS] = initialCondition[CONTROL_POS] + d;
+
+	std::vector<double> res(STATE_SIZE);
+	integrateSystem(functionName, initialCondition, res, 0, tau);
+
+	Vector3d v(res.data());
+	return v;
+	//initialCondition has the last
+}
 
 
 #endif
