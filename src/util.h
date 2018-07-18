@@ -43,7 +43,8 @@ typedef std::vector< double > stateType;
 typedef boost::numeric::ublas::vector< double > vectorBoost;
 typedef boost::numeric::ublas::matrix< double > matrixBoost;
 
-
+typedef const std::vector<double> vecDoub_I; // Utility vector for input
+typedef std::vector<double>  vecDoub_IO;// Utility vector for input & ouput
 
 //The class representing a fixpoint [x,y,z] and if info about 
 //convergence and stability

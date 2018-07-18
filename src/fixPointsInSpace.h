@@ -4,22 +4,47 @@ That is the algorithms 2.1 and 2.2 of Wei 2014
 */
 
 #ifndef FIXPOINTSINSPACE_H
+///< .
 #define FIXPOINTSINSPACE_H
 
 #include "util.h"
 #include "integrationode.h"
 #include "newtonpoincare.h"
 
+/**********************************************************************************************//**
+ * @fn	template <class T> std::vector<fixPoint> al21(vecDoub_I stateMin, vecDoub_I stateMax,vecDoub_I divisions, T &functionName, double tau, double d)
+ *
+ * @brief	Return a set(vector) of fixed points
+ *
+ * @author	Iron
+ * @date	7/17/2018
+ *
+ * @tparam	T	Generic type parameter for resieving any class represting a ODE system
+ *				    with a functor
+ * @param 		  	stateMin		Vector that contains the Xmin,Ymin,Zmin...
+ * @param 		  	stateMax		Vector that contains the Xmax,Ymax,Zmax...
+ * @param 		  	divisions   	The number of divisionts for each interval e.g [xmin,xmax] .
+ * @param [in,out]	functionName	Name of the function that is a class with a functor.
+ * @param 		  	tau				Param tau.
+ * @param 		  	d				A double to process.
+ *
+ * @return	A std::vector&lt;fixPoint&gt;
+ *
+ * ### tparam	T	Generic type parameter .
+ **************************************************************************************************/
 
-//Return a set(vector) of fixed points
 template <class T>
-std::vector<fixPoint> al21(double xmin, double xmax, double ymin, double ymax,
-	double zmin,double zmax, double M, double N, double L, T &functionName, double tau, double d)
+std::vector<fixPoint> al21(vecDoub_I stateMin, vecDoub_I stateMax,vecDoub_I divisions, T &functionName, double tau, double d)
 {
 	std::vector<fixPoint> S;
-	double xstep = xmax / M;
-	double ystep = ymax / N;
-	double zstep = zmax / L;
+	vecDoub_IO steps;
+	//create the steps sizes for each interval
+	for (int i = 0; i < stateMax.size(); i++) {
+		steps.push_back((stateMax[i] - stateMin[i]) / divisions[i]);
+	}
+	//double xstep = xmax  / M;
+	//double ystep = ymax / N;
+	//double zstep = zmax / L;
 	//double xmin = 0;
 	//double ymin = 0;
 	//double zmin = 0;
@@ -28,7 +53,7 @@ std::vector<fixPoint> al21(double xmin, double xmax, double ymin, double ymax,
 
 //concat
 //vector1.insert( vector1.end(), vector2.begin(), vector2.end() );
-
+//TODO: aqui me quede en implementar este for para el caso general
 	double i, j, k;
 	for (i = xmin; i < xmax; i += xstep)
 		for (j = ymin; j < ymax; j += ystep)
@@ -49,18 +74,63 @@ std::vector<fixPoint> al21(double xmin, double xmax, double ymin, double ymax,
 }
 
 //For saving a point on the space [x,y,z] 
+
+/**********************************************************************************************//**
+ * @struct	pointxyz
+ *
+ * @brief	A pointxyz.
+ *
+ * @author	Iron
+ * @date	7/17/2018
+ **************************************************************************************************/
+
 struct pointxyz
 {
+	/** @brief	The x coordinate */
 	double x;
+	/** @brief	The y coordinate */
 	double y;
+	/** @brief	The z coordinate */
 	double z;
 	pointxyz(double x_, double y_, double z_) :
+
+		/**********************************************************************************************//**
+		 * @fn	x(x_), y(y_), z(z_)
+		 *
+		 * @brief	Constructor
+		 *
+		 * @author	Iron
+		 * @date	7/17/2018
+		 *
+		 * @param	parameter1	The first parameter.
+		 **************************************************************************************************/
+
 		x(x_), y(y_), z(z_) {}
 
 
 };
 
-
+/**********************************************************************************************//**
+ * @fn	template <class T> void al22(double xi, double xf, double yi, double yf, double zi, double zf, std::vector<fixPoint> &S, T &functionName, double tau, double d, int deepness)
+ *
+ * @brief	Al 22
+ *
+ * @author	Iron
+ * @date	7/17/2018
+ *
+ * @tparam	T	Generic type parameter.
+ * @param 		  	xi				The xi.
+ * @param 		  	xf				The xf.
+ * @param 		  	yi				The yi.
+ * @param 		  	yf				The yf.
+ * @param 		  	zi				The zi.
+ * @param 		  	zf				The zf.
+ * @param [in,out]	S				A std::vector&lt;fixPoint&gt; to process.
+ * @param [in,out]	functionName	Name of the function.
+ * @param 		  	tau				The tau.
+ * @param 		  	d				A double to process.
+ * @param 		  	deepness		The deepness.
+ **************************************************************************************************/
 
 template <class T>
 void al22(double xi, double xf, double yi, double yf, double zi, double zf,

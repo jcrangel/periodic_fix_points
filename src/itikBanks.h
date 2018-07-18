@@ -10,16 +10,51 @@
 
 #include "util.h"
 
-
+/**********************************************************************************************//**
+ * @struct	itikBanks
+ *
+ * @brief	The class that defines the ODE system itikBanks .
+ *
+ * @author	Iron
+ * @date	7/17/2018
+ **************************************************************************************************/
 
 struct itikBanks
 {
     //The parameters
+    /** @brief	A double to process */
     double N;
 
+	/**********************************************************************************************//**
+	 * @property	double a12, a21, a13, a31
+	 *
+	 * @brief	Gets the 31
+	 *
+	 * @return	a 31.
+	 **************************************************************************************************/
+
 	double a12, a21, a13, a31;
+
+    /**********************************************************************************************//**
+     * @property	double r2, r3, d3, k3
+     *
+     * @brief	Gets the k 3
+     *
+     * @return	The k 3.
+     **************************************************************************************************/
+
     double r2, r3, d3, k3;
 
+    /**********************************************************************************************//**
+     * @fn	itikBanks(std::vector<double> parameters)
+     *
+     * @brief	Constructor
+     *
+     * @author	Iron
+     * @date	7/17/2018
+     *
+     * @param	parameters	Options for controlling the operation.
+     **************************************************************************************************/
 
     itikBanks(std::vector<double> parameters)
     {
@@ -33,12 +68,38 @@ struct itikBanks
         d3 = parameters[7];
     }
 
+    /**********************************************************************************************//**
+     * @fn	void operator()(const stateType &x, stateType &dxdt, double )
+     *
+     * @brief	Function call operator
+     *
+     * @author	Iron
+     * @date	7/17/2018
+     *
+     * @param 		  	x		  	A stateType to process.
+     * @param [in,out]	dxdt	  	The dxdt.
+     * @param 		  	parameter3	The third parameter.
+     **************************************************************************************************/
+
     void operator()(const stateType &x, stateType &dxdt, double /*t*/)
     {
         dxdt[0] = x[0] * (1 - x[0]) - a12 * x[0] * x[1] - a13 * x[0] * x[2];
         dxdt[1] = r2 * x[1] * (1 - x[1]) - a21 * x[0] * x[1];
         dxdt[2] = (r3 * x[0] * x[2]) / (k3 + x[0]) - a31 * x[0] * x[2] - d3 * x[2];
     }
+
+    /**********************************************************************************************//**
+     * @fn	void operator()(const vectorBoost &x, vectorBoost &dxdt, double )
+     *
+     * @brief	Function call operator
+     *
+     * @author	Iron
+     * @date	7/17/2018
+     *
+     * @param 		  	x		  	A vectorBoost to process.
+     * @param [in,out]	dxdt	  	The dxdt.
+     * @param 		  	parameter3	The third parameter.
+     **************************************************************************************************/
 
     void operator()(const vectorBoost &x, vectorBoost &dxdt, double /*t*/)
     {
@@ -48,6 +109,21 @@ struct itikBanks
     }
 
     //The jacobian  needed for the stiff solver
+
+    /**********************************************************************************************//**
+     * @fn	void operator()(const vectorBoost &x, matrixBoost &M, double , vectorBoost &dfdt)
+     *
+     * @brief	Function call operator
+     *
+     * @author	Iron
+     * @date	7/17/2018
+     *
+     * @param 		  	x		  	A vectorBoost to process.
+     * @param [in,out]	M		  	A matrixBoost to process.
+     * @param 		  	parameter3	The third parameter.
+     * @param [in,out]	dfdt	  	The dfdt.
+     **************************************************************************************************/
+
     void operator()(const vectorBoost &x, matrixBoost &M, double /*t*/, vectorBoost &dfdt)
 	{
 		double T = x[0];
@@ -76,15 +152,46 @@ struct itikBanks
 
 //This jacobian is calculated over all one solution X(t)
 //The system dv/dt = Df(u)v equation (7)
+
+/**********************************************************************************************//**
+ * @struct	itikBanksDFu_v
+ *
+ * @brief	An itik banks d fu v.
+ *
+ * @author	Iron
+ * @date	7/17/2018
+ **************************************************************************************************/
+
 struct itikBanksDFu_v
 {
+    /**********************************************************************************************//**
+     * @property	double a12, a21, a13, a31
+     *
+     * @brief	Gets the 31
+     *
+     * @return	a 31.
+     **************************************************************************************************/
 
     double a12, a21, a13, a31;
+
+    /**********************************************************************************************//**
+     * @property	double r2, r3, d3, k3
+     *
+     * @brief	Gets the k 3
+     *
+     * @return	The k 3.
+     **************************************************************************************************/
+
     double r2, r3, d3, k3;
+    /** @brief	The state */
     std::vector<stateType> state;
+	/** @brief	The times */
 	stateType times;
+    /** @brief	A boost::math::barycentric_rational&lt;double&gt; to process */
     boost::math::barycentric_rational<double> T;
+    /** @brief	A boost::math::barycentric_rational&lt;double&gt; to process */
     boost::math::barycentric_rational<double> H;
+    /** @brief	A boost::math::barycentric_rational&lt;double&gt; to process */
     boost::math::barycentric_rational<double> E;
 
     itikBanksDFu_v(std::vector<double> parameters, std::vector< stateType > xx, stateType tt)
@@ -92,6 +199,20 @@ struct itikBanksDFu_v
                     times(tt),
                     T(times.data(), state[0].data(), times.size()),
                     H(times.data(), state[1].data(), times.size()),
+
+                    /**********************************************************************************************//**
+                     * @fn	E(times.data(), state[2].data(), times.size())
+                     *
+                     * @brief	Constructor
+                     *
+                     * @author	Iron
+                     * @date	7/17/2018
+                     *
+                     * @param	parameter1	The first parameter.
+                     * @param	parameter2	The second parameter.
+                     * @param	parameter3	The third parameter.
+                     **************************************************************************************************/
+
                     E(times.data(), state[2].data(), times.size())
     {
         a12 = parameters[0];
@@ -117,6 +238,20 @@ struct itikBanksDFu_v
 	//(D1 x1 + D2 x4 + D3 x7 | D1 x2 + D2 x5 + D3 x8 | D1 x3 + D2 x6 + D3 x9
 	//	D4 x1 + D5 x4 + D6 x7 | D4 x2 + D5 x5 + D6 x8 | D4 x3 + D5 x6 + D6 x9
 	//	D7 x1 + D8 x4 + D9 x7 | D7 x2 + D8 x5 + D9 x8 | D7 x3 + D8 x6 + D9 x9)
+
+    /**********************************************************************************************//**
+     * @fn	void operator()(const stateType &x, stateType &dxdt, double t)
+     *
+     * @brief	Function call operator
+     *
+     * @author	Iron
+     * @date	7/17/2018
+     *
+     * @param 		  	x   	A stateType to process.
+     * @param [in,out]	dxdt	The dxdt.
+     * @param 		  	t   	A double to process.
+     **************************************************************************************************/
+
     void operator()(const stateType &x, stateType &dxdt, double t)
     {
 		dxdt[0] = (1 - E(t) * a13 - H(t) * a12 - 2 * T(t)) * x[0] + (-T(t) * a12)* x[3] + (-T(t) * a13)* x[6];
@@ -133,6 +268,21 @@ struct itikBanksDFu_v
     }
 
 	//The jacobian  needed for the stiff solver
+
+	/**********************************************************************************************//**
+	 * @fn	void operator()(const vectorBoost &x, matrixBoost &M, double t, vectorBoost &dfdt)
+	 *
+	 * @brief	Function call operator
+	 *
+	 * @author	Iron
+	 * @date	7/17/2018
+	 *
+	 * @param 		  	x   	A vectorBoost to process.
+	 * @param [in,out]	M   	A matrixBoost to process.
+	 * @param 		  	t   	A double to process.
+	 * @param [in,out]	dfdt	The dfdt.
+	 **************************************************************************************************/
+
 	void operator()(const vectorBoost &x, matrixBoost &M, double t, vectorBoost &dfdt)
 	{
 		double m1 = (1 - E(t) * a13 - H(t) * a12 - 2 * T(t));
@@ -169,18 +319,58 @@ struct itikBanksDFu_v
 
 //This ja
 
+/**********************************************************************************************//**
+ * @struct	itikBanksJacobian
+ *
+ * @brief	An itik banks jacobian.
+ *
+ * @author	Iron
+ * @date	7/17/2018
+ **************************************************************************************************/
+
 struct itikBanksJacobian
 {
+	/**********************************************************************************************//**
+	 * @property	double a12, a21, a13, a31
+	 *
+	 * @brief	Gets the 31
+	 *
+	 * @return	a 31.
+	 **************************************************************************************************/
 
 	double a12, a21, a13, a31;
+
+	/**********************************************************************************************//**
+	 * @property	double r2, r3, d3, k3
+	 *
+	 * @brief	Gets the k 3
+	 *
+	 * @return	The k 3.
+	 **************************************************************************************************/
+
 	double r2, r3, d3, k3;
+	/** @brief	A double to process */
 	double T;
+	/** @brief	The height */
 	double H;
+	/** @brief	A double to process */
 	double E;
 
 	itikBanksJacobian(std::vector<double> parameters,double T_,double H_, double E_):
 		T(T_),
 		H(H_),
+
+		/**********************************************************************************************//**
+		 * @fn	E(E_)
+		 *
+		 * @brief	Constructor
+		 *
+		 * @author	Iron
+		 * @date	7/17/2018
+		 *
+		 * @param	parameter1	The first parameter.
+		 **************************************************************************************************/
+
 		E(E_)
 	{
 		a12 = parameters[0];
@@ -192,6 +382,20 @@ struct itikBanksJacobian
 		a31 = parameters[6];
 		d3 = parameters[7];
 	}
+
+	/**********************************************************************************************//**
+	 * @fn	void operator()(const stateType &x, stateType &dxdt, double t)
+	 *
+	 * @brief	Function call operator
+	 *
+	 * @author	Iron
+	 * @date	7/17/2018
+	 *
+	 * @param 		  	x   	A stateType to process.
+	 * @param [in,out]	dxdt	The dxdt.
+	 * @param 		  	t   	A double to process.
+	 **************************************************************************************************/
+
 	void operator()(const stateType &x, stateType &dxdt, double t)
 	{
 		dxdt[0] = (1 - E * a13 - H * a12 - 2 * T) * x[0] + (-T * a12)* x[3] + (-T * a13)* x[6];
@@ -214,6 +418,18 @@ struct itikBanksJacobian
 
 
 //How to read paramters for this functon 
+
+/**********************************************************************************************//**
+ * @fn	std::vector<double> readParameters()
+ *
+ * @brief	Reads the parameters
+ *
+ * @author	Iron
+ * @date	7/17/2018
+ *
+ * @return	The parameters.
+ **************************************************************************************************/
+
 std::vector<double> readParameters() {
 	int numParam = 8;
 	std::vector<double> param(numParam);
