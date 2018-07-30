@@ -230,7 +230,7 @@ MatrixXd DFode_aprox(T &fun, stateType initialCondition,
 		//stateType f=func(xh);
 		VectorXd f = evalFunInLast(fun, xh, tau, d);
 		xh[j] = temp;
-		for (int i = 0; i<n; i++)// TODO: This is ok? check if this is good in N-Dim
+		for (int i = 0; i < n; i++)// TODO: This is ok? check if this is good in N-Dim
 			df(i, j) = (f[i] - fvec[i]) / h;
 	}
 	return df;
