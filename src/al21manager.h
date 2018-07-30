@@ -13,8 +13,6 @@ This is acts as a interface for algorithm 21 for managing data, etc.
 void runAl21() {
 
 	double xmin = 0; double xmax = 1;
-	double ymin = 0; double ymax = 1;
-	double zmin = 0; double zmax = 1;
 	double M=10;
 	//std::cin >> xmin >> xmax;
 	//std::cin >> ymin >> ymax;
@@ -30,15 +28,14 @@ void runAl21() {
 	std::vector<fixPoint> S;
 
 
-	S = al21(xmin, xmax, ymin, ymax, zmin, zmax, M, M, M, fun, tau, d);
+	S = al21(xmin, xmax, M, fun, tau, d);
 	//std::ofstream points("points.txt", std::ios::out | std::ios::trunc);
 	
 	LogAndStdout lcout("points_log.txt");
 	lcout << "========================================================\n";
 	lcout << "Working with\n";
 	lcout << "X=[" << xmin << " , " << xmax << " ]\n";
-	lcout << "Y=[" << ymin << " , " << ymax << " ]\n";
-	lcout << "Z=[" << zmin << " , " << zmax << " ]\n";
+	lcout << fun.getSystemSize() <<" intervals \n";
 	lcout << "M: " << M << "tau: "<< tau << "d: "<<d << "\n";
 	lcout << "Parameters:\n ";
 	lcout << "(a12,a13,r2,a21,r3,k3,a31,d3)=(";

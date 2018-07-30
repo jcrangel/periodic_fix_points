@@ -206,16 +206,18 @@ fixPoint newtonPoincare_stiff(T &fun, stateType initialCondition, double tau, do
 //	return reshapeVectorToMatrix(identityMatrixVector);
 //};
 
-//Calculate the jacobian of the poincare map given by equations (6) & (7)
+//Calculate the jacobian of the poincare map given by equations (6) & (7) 
+// N-Dim system
 template <class T>
-Matrix3d DFode_aprox(T &fun, stateType initialCondition,
+MatrixXd DFode_aprox(T &fun, stateType initialCondition,
 	double tau, double d)
 {
 	const double EPS = 1.0e-8;
-	int n = initialCondition.size();
-	Matrix3d df/*(n,n)*/;
+	//int n = initialCondition.size();
+	int n = fun.getSystemSize();
+	MatrixXd df(n,n);
 	stateType xh = initialCondition;
-	Vector3d fvec = evalFunInLast(fun, initialCondition, tau, d);
+	VectorXd fvec = evalFunInLast(fun, initialCondition, tau, d);
 
 
 	for (int j = 0; j<n; j++)
@@ -226,13 +228,14 @@ Matrix3d DFode_aprox(T &fun, stateType initialCondition,
 		xh[j] = temp + h;
 		h = xh[j] - temp;
 		//stateType f=func(xh);
-		Vector3d f = evalFunInLast(fun, xh, tau, d);
+		VectorXd f = evalFunInLast(fun, xh, tau, d);
 		xh[j] = temp;
-		for (int i = 0; i<n; i++)
+		for (int i = 0; i<n; i++)// TODO: This is ok? check if this is good in N-Dim
 			df(i, j) = (f[i] - fvec[i]) / h;
 	}
 	return df;
 };
+
 
 
 //calculate the jacobian receiving the data of eq (6) in Fx

@@ -24,26 +24,9 @@ struct itikBanks
     //The parameters
     /** @brief	A double to process */
     double N;
-
-	/**********************************************************************************************//**
-	 * @property	double a12, a21, a13, a31
-	 *
-	 * @brief	Gets the 31
-	 *
-	 * @return	a 31.
-	 **************************************************************************************************/
-
 	double a12, a21, a13, a31;
-
-    /**********************************************************************************************//**
-     * @property	double r2, r3, d3, k3
-     *
-     * @brief	Gets the k 3
-     *
-     * @return	The k 3.
-     **************************************************************************************************/
-
     double r2, r3, d3, k3;
+	int systemSize = 3; // number of ODEs of the system
 
     /**********************************************************************************************//**
      * @fn	itikBanks(std::vector<double> parameters)
@@ -68,38 +51,12 @@ struct itikBanks
         d3 = parameters[7];
     }
 
-    /**********************************************************************************************//**
-     * @fn	void operator()(const stateType &x, stateType &dxdt, double )
-     *
-     * @brief	Function call operator
-     *
-     * @author	Iron
-     * @date	7/17/2018
-     *
-     * @param 		  	x		  	A stateType to process.
-     * @param [in,out]	dxdt	  	The dxdt.
-     * @param 		  	parameter3	The third parameter.
-     **************************************************************************************************/
-
     void operator()(const stateType &x, stateType &dxdt, double /*t*/)
     {
         dxdt[0] = x[0] * (1 - x[0]) - a12 * x[0] * x[1] - a13 * x[0] * x[2];
         dxdt[1] = r2 * x[1] * (1 - x[1]) - a21 * x[0] * x[1];
         dxdt[2] = (r3 * x[0] * x[2]) / (k3 + x[0]) - a31 * x[0] * x[2] - d3 * x[2];
     }
-
-    /**********************************************************************************************//**
-     * @fn	void operator()(const vectorBoost &x, vectorBoost &dxdt, double )
-     *
-     * @brief	Function call operator
-     *
-     * @author	Iron
-     * @date	7/17/2018
-     *
-     * @param 		  	x		  	A vectorBoost to process.
-     * @param [in,out]	dxdt	  	The dxdt.
-     * @param 		  	parameter3	The third parameter.
-     **************************************************************************************************/
 
     void operator()(const vectorBoost &x, vectorBoost &dxdt, double /*t*/)
     {
@@ -108,12 +65,11 @@ struct itikBanks
         dxdt[2] = (r3 * x[0] * x[2]) / (k3 + x[0]) - a31 * x[0] * x[2] - d3 * x[2];
     }
 
-    //The jacobian  needed for the stiff solver
 
     /**********************************************************************************************//**
      * @fn	void operator()(const vectorBoost &x, matrixBoost &M, double , vectorBoost &dfdt)
      *
-     * @brief	Function call operator
+     * @brief	The jacobian  needed for the stiff solver
      *
      * @author	Iron
      * @date	7/17/2018
@@ -146,6 +102,10 @@ struct itikBanks
 			dfdt[1] = 0;
 			dfdt[2] = 0;
 
+	}
+
+	int getSystemSize() {
+		return systemSize;
 	}
 
 };
