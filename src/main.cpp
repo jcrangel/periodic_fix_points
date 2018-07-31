@@ -2,7 +2,7 @@
 TODO:1. Define StateType as Vector3d so is congruent with all the program.
     -- Create a function that integrate inside use std::vector outside return Vector3d
     --
-
+TODO:2. Create a config.h were all types are definen and including VectorXd etc. 
 Symbols:
         #_# means that part of the should be rewritten to support systems of several size
         !@_@ incongruence with Vector and std::vector

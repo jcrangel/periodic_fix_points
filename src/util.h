@@ -25,7 +25,7 @@ Common data type definition and functions for vector manipulation.
 #include <boost/numeric/odeint.hpp>
 #include <boost/math/interpolators/barycentric_rational.hpp>
 
-#define STATE_SIZE 3
+#define STATE_SIZE 3 //TODO: remove this
 #define CONTROL_POS 2
 #define DEBUG0 true
 #define DEBUG1 false
@@ -113,9 +113,9 @@ public:
     /** @brief	True to stability */
     bool stability;
     /** @brief	The solution */
-    Vector3d solution;
+    VectorXd solution;
 
-    fixPoint(bool convergent_,bool stability_,Vector3d solution_) :
+    fixPoint(bool convergent_,bool stability_,VectorXd solution_) :
         convergent(convergent_),
         stability(stability_),
 
@@ -253,7 +253,7 @@ bool equal(double A, double B, double epsilon = 0.000005f)
  * @return	V as a std::vector&lt;double&gt;
  **************************************************************************************************/
 
-std::vector<double> toStdVectorD(const Vector3d v)
+stateType toStateType(const VectorXd v)
 {
     std::vector<double> v2;
     v2.resize(v.size());
@@ -274,7 +274,7 @@ std::vector<double> toStdVectorD(const Vector3d v)
  * @param [in,out]	w	A stateType to process.
  **************************************************************************************************/
 
-void toStdVectorD(const Vector3d v, stateType &w)
+void toStateType(const VectorXd v, stateType &w)
 {
 	w.resize(v.size());
 	VectorXd::Map(&w[0], v.size()) = v;
@@ -293,7 +293,7 @@ void toStdVectorD(const Vector3d v, stateType &w)
  * @return	V as a std::vector&lt;double&gt;
  **************************************************************************************************/
 
-std::vector<double> toStdVectorD(vectorBoost v)
+stateType toStateType(vectorBoost v)
 {
 	std::vector<double> w(v.size());
 	std::copy(v.begin(), v.end(), w.begin());
@@ -333,9 +333,12 @@ vectorBoost toBoostVectorD(const stateType v)
  * @return	V as a Vector3d.
  **************************************************************************************************/
 
-Vector3d toEigenVector(const stateType v) {
-	Vector3d v2(v.data());
-	return v2;
+VectorXd toEigenVector(stateType v) {
+	//double* ptr = &v[0];
+	//Eigen::Map< Eigen::VectorXd> v2(ptr, v.size());
+	////Vector3d v2(v.data());
+	//return v2;
+	return VectorXd::Map(v.data(), v.size());
 }
 
 

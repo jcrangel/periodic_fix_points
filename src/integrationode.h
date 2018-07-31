@@ -27,7 +27,7 @@ struct push_back_state_and_time
 
 	void operator()(const vectorBoost &x, double t)
 	{
-		m_states.push_back(toStdVectorD(x));
+		m_states.push_back(toStateType(x));
 		m_times.push_back(t);
 	}
 };

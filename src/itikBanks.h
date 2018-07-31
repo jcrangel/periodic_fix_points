@@ -19,14 +19,32 @@
  * @date	7/17/2018
  **************************************************************************************************/
 
-struct itikBanks
+class itikBanks
 {
-    //The parameters
-    /** @brief	A double to process */
-    double N;
+private:
+	std::vector<double> parameters;//TODO: Check for the correct size
+	const int systemSize = 3; // number of ODEs of the system
+	int controlPosition = 2; // The index of the state where the control happens
+
+	//These are for expressing more easy the system formulas
 	double a12, a21, a13, a31;
-    double r2, r3, d3, k3;
-	int systemSize = 3; // number of ODEs of the system
+	double r2, r3, d3, k3;
+
+	void loadParameters() {
+		a12 = parameters[0];
+		a13 = parameters[1];
+		r2 = parameters[2];
+		a21 = parameters[3];
+		r3 = parameters[4];
+		k3 = parameters[5];
+		a31 = parameters[6];
+		d3 = parameters[7];
+	}
+
+	void changeParameters(std::vector<double> newParameters) {
+		parameters = newParameters;
+		loadParameters();
+	}
 
     /**********************************************************************************************//**
      * @fn	itikBanks(std::vector<double> parameters)
@@ -38,18 +56,10 @@ struct itikBanks
      *
      * @param	parameters	Options for controlling the operation.
      **************************************************************************************************/
-
-    itikBanks(std::vector<double> parameters)
-    {
-        a12 = parameters[0];
-        a13 = parameters[1];
-        r2 = parameters[2];
-        a21 = parameters[3];
-        r3 = parameters[4];
-        k3 = parameters[5];
-        a31 = parameters[6];
-        d3 = parameters[7];
-    }
+public:
+    itikBanks(std::vector<double> parameters): parameters(parameters){
+		loadParameters();
+	}
 
     void operator()(const stateType &x, stateType &dxdt, double /*t*/)
     {
@@ -82,6 +92,7 @@ struct itikBanks
 
     void operator()(const vectorBoost &x, matrixBoost &M, double /*t*/, vectorBoost &dfdt)
 	{
+
 		double T = x[0];
 		double H = x[1];
 		double E = x[2];

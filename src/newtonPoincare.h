@@ -11,7 +11,7 @@ Procedures to obtain the jacobian following the procedure in eq (6)&(7) of the
 
 
 
-//Gets the jacobian following the procedure in eq (6)&(7) of the
+//Gets the jacobian following the procedure in eq (6) & (7) of the
 //paper Wei 2014
 template <class T>
 fixPoint newtonPoincare(T &fun, stateType initialCondition, double tau, double d) {
@@ -20,21 +20,22 @@ fixPoint newtonPoincare(T &fun, stateType initialCondition, double tau, double d
 	stateType xp{ 0, tau }; //% define the span of the computational domain
 	double tol = 1e-6;
 	int maxStep = 100;
+	int N = fun.getSystemSize();
 
-	Vector3d Xk(initialCondition.data());
-	Vector3d Pxk;
-	Matrix3d df;
-	Matrix3d A;
-	Matrix3d I = Matrix3d::Identity();
-	Vector3d y;
-	Vector3d Xplus;
-	size_t steps;
+	VectorXd Xk = toEigenVector(initialCondition);
+	VectorXd Pxk;
+	MatrixXd df;
+	MatrixXd A;
+	MatrixXd I = MatrixXd::Identity(N,N);
+	VectorXd y;
+	VectorXd Xplus;
+
 
 	//stateType initCond;
 
 	while (n < maxStep) {                   //!@_@
-		df = DFode_aprox(fun, stateType{ Xk[0], Xk[1], Xk[2] }, tau, d);  //Jacobian
-		toStdVectorD(Xk, initialCondition);
+		df = DFode_aprox(fun, toStateType(Xk), tau, d);  //Jacobian
+		initialCondition = toStateType(Xk);
 		initialCondition[CONTROL_POS] = initialCondition[CONTROL_POS] + d;
 
 		//  STIFF INTEGRATION simple------------------
@@ -95,7 +96,7 @@ fixPoint newtonPoincare_stiff(T &fun, stateType initialCondition, double tau, do
 
     while (n < maxStep) {                   //!@_@
         df = DFode_aprox(fun, stateType {Xk[0], Xk[1], Xk[2]}, tau, d);  //Jacobian
-		toStdVectorD(Xk, initialCondition);
+		toStateType(Xk, initialCondition);
         initialCondition[CONTROL_POS] = initialCondition[CONTROL_POS] + d;
 
         //  STIFF INTEGRATION simple------------------
