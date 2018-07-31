@@ -5,8 +5,8 @@
 #define N 4
 static int cprints = 0;
 
-void shiftRowleft(std::vector<double> &xi, std::vector<double> &xm, std::vector<double> &xf, int row) {
-	double temp1;
+void shiftRowleft(std::vector<Doub> &xi, std::vector<Doub> &xm, std::vector<Doub> &xf, int row) {
+	Doub temp1;
 	temp1 = xi[row];
 	xi[row] = xm[row];
 	xm[row] = xf[row];
@@ -14,8 +14,8 @@ void shiftRowleft(std::vector<double> &xi, std::vector<double> &xm, std::vector<
 
 }
 
-void shiftRowRight(std::vector<double> &xi, std::vector<double> &xm, std::vector<double> &xf, int row) {
-	double temp1;
+void shiftRowRight(std::vector<Doub> &xi, std::vector<Doub> &xm, std::vector<Doub> &xf, int row) {
+	Doub temp1;
 	temp1 = xf[row];
 	xf[row] = xm[row];
 	xm[row] = xi[row];
@@ -23,7 +23,7 @@ void shiftRowRight(std::vector<double> &xi, std::vector<double> &xm, std::vector
 
 }
 
-void printVectors(std::vector<double> &xi, std::vector<double> &xm, std::vector<double> &xf) {
+void printVectors(std::vector<Doub> &xi, std::vector<Doub> &xm, std::vector<Doub> &xf) {
 	for (int i = 0; i < N; i++)
 	{
 		std::cout << xi[i] << " " << xm[i] << " " << xf[i] << "\n";
@@ -51,9 +51,9 @@ int nextBitSequence(std::vector<int> &b) {
 int main(){
 
 
-	//std::vector<double> xiTemp;
-	//std::vector<double> xmTemp;
-	//std::vector<double> xfTemp;
+	//std::vector<Doub> xiTemp;
+	//std::vector<Doub> xmTemp;
+	//std::vector<Doub> xfTemp;
 	//printVectors(xi, xm, xf);
 	//shiftRowleft(xi, xm, xf, 2);
 	//std::cout << "\n";
@@ -106,9 +106,9 @@ int main(){
 	//	shiftRowleft(xi, xm, xf, j);
 
 	//}
-	std::vector<double> xi(N, 1);
-	std::vector<double> xm(N, 2);
-	std::vector<double> xf(N, 3);
+	std::vector<Doub> xi(N, 1);
+	std::vector<Doub> xm(N, 2);
+	std::vector<Doub> xf(N, 3);
 	std::vector<int>  bitArray(N, 0);
 
 	for (int i = 0; i < pow(2, N) - 1 ; i++) {

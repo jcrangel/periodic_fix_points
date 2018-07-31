@@ -18,86 +18,37 @@ Common data type definition and functions for vector manipulation.
 #include <fstream>
 #include <cmath>
 #include <vector>
-//Boosst lib
+
+//Eigen lib
+#include <Eigen/Dense>
+//Boost lib
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
-#include <Eigen/Dense>
 #include <boost/numeric/odeint.hpp>
-#include <boost/math/interpolators/barycentric_rational.hpp>
 
-#define STATE_SIZE 3 //TODO: remove this
-#define CONTROL_POS 2
+//#include <boost/math/interpolators/barycentric_rational.hpp> for not aproximate jacobian
+
+
 #define DEBUG0 true
 #define DEBUG1 false
 
-//const std::vector<double> PARAMETERS = { 1,2.5,0.5,1.5,4.5,1,0.2,0.5 };
-//This should not be global
-//std::vector<double> PARAMETERS;
-
 /**********************************************************************************************//**
- * @namespace	Eigen
+ * @typedef	std::vector<Doub> VecDoub_IO
  *
- * @brief	.
+ * @brief	Defines an alias representing the vector Doub i/o
  **************************************************************************************************/
-
-using namespace Eigen;
-
+typedef double Doub; // default floating type useful if we need to change to long double
+typedef std::vector< Doub > StateType;
+typedef boost::numeric::ublas::vector< Doub > VectorBoost;
+typedef boost::numeric::ublas::matrix< Doub > MatrixBoost;
+typedef Eigen::VectorXd VectorEigen;
+typedef Eigen::VectorXcd VectorcEigen; //Complex version
+typedef Eigen::MatrixXd MatrixEigen;
+typedef const std::vector<Doub> VecDoub_I; // Utility vector for input
+typedef std::vector<Doub>  VecDoub_IO;// Utility vector for input & ouput
 /**********************************************************************************************//**
- * @namespace	boost::numeric::odeint
- *
- * @brief	.
- **************************************************************************************************/
-
-using namespace boost::numeric::odeint;
-
-//An array [x1(t),x2(t),x3(t)]
-//typedef std::array< double, STATE_SIZE > stateType;
-
-/**********************************************************************************************//**
- * @typedef	std::vector< double > stateType
- *
- * @brief	Defines an alias representing type of the state
- **************************************************************************************************/
-
-typedef std::vector< double > stateType;
-
-/**********************************************************************************************//**
- * @typedef	boost::numeric::ublas::vector< double > vectorBoost
- *
- * @brief	Defines an alias representing the vector boost
- **************************************************************************************************/
-
-typedef boost::numeric::ublas::vector< double > vectorBoost;
-
-/**********************************************************************************************//**
- * @typedef	boost::numeric::ublas::matrix< double > matrixBoost
- *
- * @brief	Defines an alias representing the matrix boost
- **************************************************************************************************/
-
-typedef boost::numeric::ublas::matrix< double > matrixBoost;
-
-/**********************************************************************************************//**
- * @typedef	const std::vector<double> vecDoub_I
- *
- * @brief	Defines an alias representing the vector doub i
- **************************************************************************************************/
-
-typedef const std::vector<double> vecDoub_I; // Utility vector for input
-
-/**********************************************************************************************//**
- * @typedef	std::vector<double> vecDoub_IO
- *
- * @brief	Defines an alias representing the vector doub i/o
- **************************************************************************************************/
-
-typedef std::vector<double>  vecDoub_IO;// Utility vector for input & ouput
-
-//The class representing a fixpoint [x,y,z] and if info about 
+ * @class	fixPoint, The class representing a fixpoint [x,y,z] and if info about 
 //convergence and stability
-
-/**********************************************************************************************//**
- * @class	fixPoint
  *
  * @brief	A fix point.
  *
@@ -105,78 +56,64 @@ typedef std::vector<double>  vecDoub_IO;// Utility vector for input & ouput
  * @date	7/25/2018
  **************************************************************************************************/
 
-class fixPoint
+class FixPoint
 {
 public:
-    /** @brief	True to convergent */
     bool convergent;
-    /** @brief	True to stability */
     bool stability;
-    /** @brief	The solution */
-    VectorXd solution;
+    VectorEigen solution;
 
-    fixPoint(bool convergent_,bool stability_,VectorXd solution_) :
+    FixPoint(bool convergent_,bool stability_,VectorEigen solution_) :
         convergent(convergent_),
         stability(stability_),
-
-        /**********************************************************************************************//**
-         * @fn	fixPoint::solution(solution_)
-         *
-         * @brief	Constructor
-         *
-         * @author	Iron
-         * @date	7/25/2018
-         *
-         * @param	parameter1	The first parameter.
-         **************************************************************************************************/
-
         solution(solution_) {}
 
 };
 
-//typedef std::vector<fixPoint> fixPoints;
+/**********************************************************************************************//**
+ * @fn	template <class T> void transpose(const T u, std::vector < StateType > & state )
+ *
+ * @brief	Transpose a matrix of made with std::vector's. Not being used in the current version. 
+ *
+ * @author	Iron
+ * @date	7/31/2018
+ *
+ * @tparam	T	Generic type parameter.
+ * @param 		  	u	 	A T to process.
+ * @param [in,out]	state	The state.
+ **************************************************************************************************/
 
-//Transpose a matrix of made with std::vector's
 template <class T>
-void transpose(const T u,
-               /** @brief	The ) */
-               std::vector < stateType > & state )
+void transpose(const T u, std::vector < StateType > & state )
 {
     //Copy the data as transpose
-    //for some stupid reason in windows we need i < u.size in ubuntu ins i <= u.size
+    //for some reason in windows we need i < u.size in ubuntu ins i <= u.size
     for(int i = 0; i < u.size() ; i++)
-        for (int j = 0; j < STATE_SIZE ; j++ )
+							// STATE_SIZE before, posibly a source of bugs
+        for (int j = 0; j < state.size() ; j++ )
             state[j][i] = u[i][j];
-
 }
 
 
 
-
-
-//Reshape a vector Size N^2 into a Matrix NxN,
-//vector is assumed to come in row order
-
-template <class T>
-
 /**********************************************************************************************//**
- * @fn	Matrix3d reshapeVectorToMatrix(const T x)
+ * @fn	MatrixEigen reshapeVectorToMatrix(const T x)
  *
- * @brief	Reshape vector to matrix
+ * @brief	Reshape a vector Size N^2 into a Matrix NxN,vector is assumed to come in row order
  *
  * @author	Iron
  * @date	7/25/2018
  *
  * @param	x	A T to process.
  *
- * @return	A Matrix3d.
+ * @return	A MatrixEigen.
  **************************************************************************************************/
-
-Matrix3d reshapeVectorToMatrix(const T x)
+template <class T>
+MatrixEigen reshapeVectorToMatrix(const T x)
 {
 
     int N = sqrt(x.size());
-    Matrix3d A(N,N);
+    MatrixEigen A(N,N);
 
     for (int i = 0; i < N; i++)
     {
@@ -190,25 +127,26 @@ Matrix3d reshapeVectorToMatrix(const T x)
 }
 
 
-//Calculate all eigenvalues of matrix A, if all of them are less tahn 1
+//
 // the matrix is stable()true.
 
 /**********************************************************************************************//**
- * @fn	bool isStable(MatrixXd A)
+ * @fn	bool isStable(MatrixEigen A)
  *
- * @brief	Query if 'A' is stable
+ * @brief	Query if Matrix 'A' is stable. Calculate all eigenvalues of matrix A, if all of them 
+ * 			are less than 1, is stable.
  *
  * @author	Iron
  * @date	7/25/2018
  *
- * @param	A	A MatrixXd to process.
+ * @param	A	A MatrixEigen to process.
  *
  * @return	True if stable, false if not.
  **************************************************************************************************/
 
-bool isStable(MatrixXd A)
+bool isStable(MatrixEigen A)
 {
-    VectorXcd eivals = A.eigenvalues();
+    VectorcEigen eivals = A.eigenvalues();
     for (int i = 0; i < eivals.size(); ++i)
         if (std::abs(eivals[i]) >= 1)
             return false;
@@ -216,139 +154,131 @@ bool isStable(MatrixXd A)
     return true;
 };
 
-
-//Cheking for equality,
-
 /**********************************************************************************************//**
- * @fn	bool equal(double A, double B, double epsilon = 0.000005f)
+ * @fn	bool equal(Doub A, Doub B, Doub epsilon = 0.000005f)
  *
- * @brief	Equals
+ * @brief	Cheks for aproximate  equality. 
  *
  * @author	Iron
  * @date	7/25/2018
  *
- * @param	A	   	A double to process.
- * @param	B	   	A double to process.
+ * @param	A	   	A Doub to process.
+ * @param	B	   	A Doub to process.
  * @param	epsilon	(Optional) The epsilon.
  *
  * @return	True if it succeeds, false if it fails.
  **************************************************************************************************/
 
-bool equal(double A, double B, double epsilon = 0.000005f)
+bool equal(Doub A, Doub B, Doub epsilon = 0.000005f)
 {
     return (fabs(A - B) < epsilon);
 }
-//get a std vector from eigen Vector3d
 
 /**********************************************************************************************//**
- * @fn	std::vector<double> toStdVectorD(const Vector3d v)
+ * @fn	std::vector<Doub> toStdVectorD(const Vector3d v)
  *
- * @brief	Converts a v to a standard vector d
+ * @brief	Get a std vector from eigen Vector3d
  *
  * @author	Iron
  * @date	7/25/2018
  *
  * @param	v	A Vector3d to process.
  *
- * @return	V as a std::vector&lt;double&gt;
+ * @return	V as a std::vector&lt;Doub&gt;
  **************************************************************************************************/
 
-stateType toStateType(const VectorXd v)
+StateType toStateType(const VectorEigen v)
 {
-    std::vector<double> v2;
+    std::vector<Doub> v2;
     v2.resize(v.size());
-    VectorXd::Map(&v2[0], v.size()) = v;
+    VectorEigen::Map(&v2[0], v.size()) = v;
     return v2;
 }
-//Copy a Vector3d into a std vector
+
 
 /**********************************************************************************************//**
- * @fn	void toStdVectorD(const Vector3d v, stateType &w)
+ * @fn	void toStdVectorD(const Vector3d v, StateType &w)
  *
- * @brief	Converts this object to a standard vector d
+ * @brief	Copy a Vector3d into a std vector
  *
  * @author	Iron
  * @date	7/25/2018
  *
  * @param 		  	v	A Vector3d to process.
- * @param [in,out]	w	A stateType to process.
+ * @param [in,out]	w	A StateType to process.
  **************************************************************************************************/
 
-void toStateType(const VectorXd v, stateType &w)
+void toStateType(const VectorEigen v, StateType &w)
 {
 	w.resize(v.size());
-	VectorXd::Map(&w[0], v.size()) = v;
+	VectorEigen::Map(&w[0], v.size()) = v;
 }
 
 /**********************************************************************************************//**
- * @fn	std::vector<double> toStdVectorD(vectorBoost v)
+ * @fn	std::vector<Doub> toStdVectorD(VectorBoost v)
  *
- * @brief	Converts a v to a standard vector d
+ * @brief	Converts a vector drom Boost libs to a standard vector. 
  *
  * @author	Iron
  * @date	7/25/2018
  *
- * @param	v	A vectorBoost to process.
+ * @param	v	A VectorBoost to process.
  *
- * @return	V as a std::vector&lt;double&gt;
+ * @return	V as a std::vector&lt;Doub&gt;
  **************************************************************************************************/
 
-stateType toStateType(vectorBoost v)
+StateType toStateType(VectorBoost v)
 {
-	std::vector<double> w(v.size());
+	std::vector<Doub> w(v.size());
 	std::copy(v.begin(), v.end(), w.begin());
 	return w;
 }
 
 /**********************************************************************************************//**
- * @fn	vectorBoost toBoostVectorD(const stateType v)
+ * @fn	VectorBoost toBoostVectorD(const StateType v)
  *
- * @brief	Converts a v to a boost vector d
+ * @brief	Converts a standard vector to a boost vector.
  *
  * @author	Iron
  * @date	7/25/2018
  *
- * @param	v	A stateType to process.
+ * @param	v	A StateType to process.
  *
- * @return	V as a vectorBoost.
+ * @return	V as a VectorBoost.
  **************************************************************************************************/
 
-vectorBoost toBoostVectorD(const stateType v)
+VectorBoost toBoostVectorD(const StateType v)
 {
-	vectorBoost x(v.size());
+	VectorBoost x(v.size());
 	std::copy(v.begin(), v.end(), x.begin());
 	return x;
 }
 
 /**********************************************************************************************//**
- * @fn	Vector3d toEigenVector(const stateType v)
+ * @fn	Vector3d toEigenVector(const StateType v)
  *
  * @brief	Converts a v to an eigen vector
  *
  * @author	Iron
  * @date	7/25/2018
  *
- * @param	v	A stateType to process.
+ * @param	v	A StateType to process.
  *
  * @return	V as a Vector3d.
  **************************************************************************************************/
 
-VectorXd toEigenVector(stateType v) {
-	//double* ptr = &v[0];
-	//Eigen::Map< Eigen::VectorXd> v2(ptr, v.size());
+VectorEigen toEigenVector(StateType v) {
+	//Doub* ptr = &v[0];
+	//Eigen::Map< Eigen::VectorEigen> v2(ptr, v.size());
 	////Vector3d v2(v.data());
 	//return v2;
-	return VectorXd::Map(v.data(), v.size());
+	return VectorEigen::Map(v.data(), v.size());
 }
-
-
-
-// Check if the fixpoint is in the Set S 
 
 /**********************************************************************************************//**
  * @fn	bool pointIsInSet(fixPoint p, std::vector<fixPoint> S)
  *
- * @brief	Point is in set
+ * @brief	Check if the fixpoint is in the Set S . 
  *
  * @author	Iron
  * @date	7/25/2018
@@ -359,17 +289,19 @@ VectorXd toEigenVector(stateType v) {
  * @return	True if it succeeds, false if it fails.
  **************************************************************************************************/
 
-bool pointIsInSet(fixPoint p, std::vector<fixPoint> S)
+bool pointIsInSet(FixPoint p, std::vector<FixPoint> S)
 {
-	for (fixPoint i: S) {
+	for (FixPoint i: S) {
 		//Check
 		int j;
-		for (j = 0; j < STATE_SIZE; j++) {
+		//STATE_SIZE before
+		for (j = 0; j < p.solution.size(); j++) {
 
 			if ( !equal(i.solution[j],p.solution[j]) )
 				break;	//Stop comparing, vectors ain't equal
 		}
-		if (j == STATE_SIZE) // never break, then all were equal
+		//STATE_SIZE before
+		if (j == p.solution.size()) // never break, then all were equal
 			return true;
 
 	}
@@ -379,7 +311,7 @@ bool pointIsInSet(fixPoint p, std::vector<fixPoint> S)
 /**********************************************************************************************//**
  * @fn	bool pointHaveNegatives(fixPoint p)
  *
- * @brief	Point have negatives
+ * @brief	Check if the fix point have negatives values
  *
  * @author	Iron
  * @date	7/25/2018
@@ -389,7 +321,7 @@ bool pointIsInSet(fixPoint p, std::vector<fixPoint> S)
  * @return	True if it succeeds, false if it fails.
  **************************************************************************************************/
 
-bool pointHaveNegatives(fixPoint p) {
+bool pointHaveNegatives(FixPoint p) {
 	for (int i = 0; i < p.solution.size(); i++)
 		if (p.solution[i] < 0)
 			return true;
@@ -397,17 +329,12 @@ bool pointHaveNegatives(fixPoint p) {
 	return false;
 }
 
-/*
-Warper for writing both to the console and to a file.
-
-work only for one << at time
-TODO: this dont work with std::endl
-*/
 
 /**********************************************************************************************//**
  * @class	LogAndStdout
  *
- * @brief	A log and stdout.
+ * @brief	A log and stdout. Warper for writing both to the console and to a file.
+ * 			
  *
  * @author	Iron
  * @date	7/25/2018
@@ -415,14 +342,13 @@ TODO: this dont work with std::endl
 
 class LogAndStdout {
 private:
-	/** @brief	The file */
 	std::ofstream file;
 public:
 
 	/**********************************************************************************************//**
 	 * @fn	TODO::LogAndStdout(const std::string fileName)
 	 *
-	 * @brief	Constructor
+	 * @brief	Opens the file for writing and appending. 
 	 *
 	 * @author	Iron
 	 * @date	7/25/2018
@@ -435,73 +361,57 @@ public:
 	}
 
 	template<class T>
-///< .
-	LogAndStdout& operator<<(const T data) {
-///< .
+	LogAndStdout& operator<<(const T data) {//TODO: this dont work with std::endl
 		std::cout << data;
-///< .
 		file << data;
 
-		/** @brief	TODO : This clone the object? if this is true, then this is bad */
+		/*TODO : This clone the object? if this is true, then this is bad */
 		return *this;
 	}
 };
 
-
-//%Evaluate F(x,y,z)  at the final time.  
-
-
 /**********************************************************************************************//**
- * @fn	Vector3d evalFunInLast(T &functionName, stateType initialCondition, double tau, double d)
+ * @fn	template <class T> VectorEigenevalFunInLast(T &functionName, StateType initialCondition, Doub tau, Doub d)
  *
- * @brief	Eval fun in last
+ * @brief	Evaluate F(x,y,z)  at the final time.  
  *
  * @author	Iron
  * @date	7/25/2018
  *
- * @param [in,out]	functionName		Name of the function.
- * @param 		  	initialCondition	The initial condition.
- * @param 		  	tau					The tau.
- * @param 		  	d					A double to process.
- *
- * @return	A Vector3d.
+ * @return	A VectorEigen.
  **************************************************************************************************/
+
 template <class T>
-VectorXd evalFunInLast(T &functionName, stateType initialCondition, double tau, double d)
+VectorEigen evalFunInLast(T &functionName, StateType initialCondition, Doub tau, Doub d)
 {
-	initialCondition[CONTROL_POS] = initialCondition[CONTROL_POS] + d;
+	int controlIndex = functionName.getControlIndex();
+	initialCondition[controlIndex] = initialCondition[controlIndex] + d;
 	int N = functionName.getSystemSize();
-	std::vector<double> res(N);
+	std::vector<Doub> res(N);
 	integrateSystem(functionName, initialCondition, res, 0, tau);
 
-	//To create the VectorXd from the std::vector
-	double* ptr = &res[0];
-	Eigen::Map<Eigen::VectorXd> v(ptr, N);
+	//To create the VectorEigenfrom the std::vector
+	//Doub* ptr = &res[0];
+	//Eigen::Map<VectorEigen> v(ptr, N);
 
-	return v;
+	return toEigenVector(res);
 	//initialCondition has the last
 }
-
-
-/**
-Create the cartesian set A x B
-*/
-template<class T>
 
 /**********************************************************************************************//**
  * @fn	std::vector< std::vector<T> > cartesianProduct(const std::vector<T> A, const std::vector<T> B)
  *
- * @brief	Cartesian product
+ * @brief	Create the cartesian set A x B
  *
  * @author	Iron
  * @date	7/25/2018
  *
- * @param	A	A std::vector&lt;T&gt; to process.
- * @param	B	A std::vector&lt;T&gt; to process.
+ * @param	A	Set A.
+ * @param	B	Set B.
  *
  * @return	A std::vector&lt;std::vector&lt;T&gt; &gt;
  **************************************************************************************************/
-
+template<class T>
 std::vector< std::vector<T> > cartesianProduct(const std::vector<T> A, const std::vector<T> B)
 {
 	std::vector<std::vector<T> > prod;
@@ -511,9 +421,6 @@ std::vector< std::vector<T> > cartesianProduct(const std::vector<T> A, const std
 
 	return prod;
 }
-/**
-
-*/
 
 /**********************************************************************************************//**
  * @fn	template<class T> std::vector< std::vector<T> > cartesianProduct(const std::vector<std::vector<T>> A, const std::vector<T> B)
@@ -521,7 +428,7 @@ std::vector< std::vector<T> > cartesianProduct(const std::vector<T> A, const std
  * @brief	Create the cartesian set A x B = (a x b) x B, where A is already a cartesian set.
  * 			Then to create the cartesian set of {x,y,z} x {x,y,z} x {x,y,z}. We have to : s = {x,
  * 			y,z};
- * 			std::vector&lt;std::vector&lt;double&gt; &gt; prod = cartesianProduct(s,s);
+ * 			std::vector&lt;std::vector&lt;Doub&gt; &gt; prod = cartesianProduct(s,s);
  * 			prod = cartesianProduct(prod,s);
  *
  * @author	Iron
