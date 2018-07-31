@@ -9,3 +9,6 @@ bin/*
 obj/*
 
 build/*
+
+#ignore any exe
+*.exe
