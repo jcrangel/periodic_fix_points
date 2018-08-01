@@ -1,0 +1,8 @@
+dT=rT*T*Log[KT/T ]-aT*T*CTL*Ml /(eT+Ml ) ((aTBeta *FBeta  + eTBeta)/(FBeta +eTBeta));
+dH=aH-MuH*H  + rH*Den  (H  (1-H /KH));
+dCTL=aC-MuC*CTL  + rC*IL2 ( CTL  (1 - CTL /KC) );
+dDen=-MuD*Den*CTL ;
+dIL2=rI*H*Den  - MuIC*CTL*IL2  - MuI*IL2 ;
+dFBeta=rTBeta*T  -MuBeta*FBeta ;
+dFGamma=aGammaC*CTL  - MuGamma*FGamma ;
+dMl=gMl + (aMlGamma*FGamma )/(FGamma +eMlGamma)-MuMl*Ml ;

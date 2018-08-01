@@ -1,0 +1,8 @@
+dT=rT T[t] Log[KT/T[t]]-aT T[t]CTL[t]   Ml[t]/(eT+Ml[t]) ((aT\[Beta] *F\[Beta][t] + eT\[Beta])/(F\[Beta][t]+eT\[Beta]));
+dH=aH-\[Mu]H  H[t] + rH  Den[t] (H[t] (1-H[t]/KH));
+dCTL=aC-\[Mu]C CTL[t] + rC IL2[t]( CTL[t] (1 - CTL[t]/KC) );
+dDen=-\[Mu]D Den[t] CTL[t];
+dIL2=rI H[t] Den[t] - \[Mu]IC  CTL[t]  IL2[t] - \[Mu]I IL2[t];
+dF\[Beta]=rT\[Beta]  T[t] -\[Mu]\[Beta]  F\[Beta][t];
+dF\[Gamma]=a\[Gamma]C  CTL[t] - \[Mu]\[Gamma]  F\[Gamma][t];
+dMl=gMl + (aMl\[Gamma]  F\[Gamma][t])/(F\[Gamma][t]+eMl\[Gamma])-\[Mu]Ml Ml[t];

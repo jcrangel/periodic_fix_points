@@ -1,0 +1,30 @@
+param:={
+aH-> 10^-4,(*Castiglione *)
+\[Mu]H->0.005,(*Castiglione *)
+rH->10*10^-2,       (*Castiglione *)
+KH->1,(*Castiglione *)
+aC->10^-4, (* mm^3 Castiglione e*)
+\[Mu]C->0.01925, (*\[Mu]Ca 0.01925*)
+rC->0.00004*10^-2,  (*ra 61*)
+KC->1, (* Better to leave it in 1*)
+KT->carryingCT,  (*K PLOS ONE CArrying capacity have huge impact  *)
+\[Mu]D->0.009625, (*Not changed 0.01 *)
+rI->10^-2,
+\[Mu]IC->10^-7,
+\[Mu]I->10^-2,
+rT->tg, (*r 0.001060289*)
+aT->at, (*aT 0.12 PLOS ONE *)
+eT->50,
+hT-> 5.2 *10^5,
+aT\[Beta]->0.69,(*Kronik *)
+eT\[Beta]->10^4,(*Kronik *)
+rT\[Beta] -> 5.57*10^-6,(*Kronik *)
+\[Mu]\[Beta]->6.93,(*Kronik *)
+a\[Gamma]C->1.02 *10^-4,
+\[Mu]\[Gamma]->0.102,
+gMl-> 1.44,
+aMl\[Gamma] ->2.89,
+eMl\[Gamma]-> 3.38*10^5,
+\[Mu]Ml-> 0.0144
+};
+
