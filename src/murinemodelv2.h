@@ -3,7 +3,7 @@
  * @file	murinemodelv2.h
  *
  * @brief	This is the murine model for the system on the Dendritic Immunotherapy Improvement for an Optimal
-Control Murine Model. 2017 Hindawi 
+Control Murine Model. 2017 Hindawi
  **************************************************************************************************/
 
 #ifndef MURINEMODEL_H
@@ -17,6 +17,8 @@ private:
 	std::vector<Doub> parameters;
 	const int systemSize = 8; // number of states
 	int controlIndex = 3; // The index of the state where the control happens
+
+
 
 
 };
