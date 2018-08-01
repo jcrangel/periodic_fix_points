@@ -46,7 +46,7 @@ void runAl21() {
 		lcout << i.solution[0] << "\t" <<
 			i.solution[1] << "\t" << i.solution[2] << "\t" << i.stability << "\n";
 	}
-	std::cin.get();
+	/*std::cin.get();*/
 }
 
 
