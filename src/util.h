@@ -492,8 +492,16 @@ void printVectorVector(std::vector< std::vector<T> > M)
 
 }
 
+void nextPointSubdomain(std::vector<Doub> &b, Doub min, Doub max, Doub step)
+{
+	int i = 0;
 
-
-
+	while (equal(b[i], max - step)) // do it with equals
+	{
+		b[i] = min;
+		i++;
+	}
+	b[i] += step;
+}
 
 #endif

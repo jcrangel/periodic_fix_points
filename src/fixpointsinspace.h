@@ -11,7 +11,7 @@ That is the algorithms 2.1 and 2.2 of Wei 2014
 #include "integrationode.h"
 #include "newtonpoincare.h"
 
-/**********************************************************************************************//**
+/**********************************************************************************************/ /**
  * @fn	template <class T> std::vector<fixPoint> al21(Doub inputDomainMin, Doub inputDomainMax, Doub divisions, T &functionName, Doub tau, Doub d)
  *
  * @brief	Generic version of Algorithm 2.1 of Wei2014. Searching on N-Dimensional space given
@@ -41,39 +41,46 @@ template <class T>
 std::vector<FixPoint> al21(Doub inputDomainMin, Doub inputDomainMax, Doub divisions, T &functionName, Doub tau, Doub d)
 {
 	std::vector<FixPoint> S;
-	std::vector<Doub> A; // The set of points from which will be create the points space (cartesian product). 
+	std::vector<Doub> A; // The set of points from which will be create the points space (cartesian product).
 	Doub step = (inputDomainMax - inputDomainMin) / divisions;
 	//Create the first set of intervals e.g [0 0.2 0.4 0.6 0.8 1]
-	for (Doub i = inputDomainMin; i < inputDomainMax; i += step) {
-		A.push_back(i);
-	}
+	// for (Doub i = inputDomainMin; i < inputDomainMax; i += step) {
+	// 	A.push_back(i);
+	// }
 	int N = functionName.getSystemSize();
-	std::vector< std::vector<Doub> > pointSpace;
-	if (N > 1) {
-		pointSpace = cartesianProduct(A, A);// Creates A x A
-		if (N > 2)
+	// std::vector< std::vector<Doub> > pointSpace;
+	// if (N > 1) {
+	// 	pointSpace = cartesianProduct(A, A);// Creates A x A
+	// 	if (N > 2)
+	// 	{
+	// 		for (int i = 1; i < N; i++) // Creates A x A x A ...
+	// 			pointSpace = cartesianProduct(pointSpace, A);
+	// 	}
+	// }
+	// Iterates over all subdomains
+	std::vector<Doub> point(N, inputDomainMin);
+
+	for (int i = 0; i < std::pow(divisions, N); i++)
+	{
+
+		if (DEBUG0)
 		{
-			for (int i = 1; i < N; i++) // Creates A x A x A ...
-				pointSpace = cartesianProduct(pointSpace, A);
-		}
-	}
-	// Iterates over all subdomains  
-	for (std::vector<Doub> i : pointSpace) {
-		if (DEBUG0) {
-			printVector(i);
+			printVector(point);
 			std::cout << "Plus step:" << step << std::endl;
 		}
-		std::vector<Doub> iplusStep(i);
-		std::for_each(iplusStep.begin(), iplusStep.end(), [step](Doub& d) {d += step; }); //add the step to each element
-		al22(i, iplusStep, S, functionName, tau, d, 1);
+		std::vector<Doub> pointPlusStep(point);
+		std::for_each(pointPlusStep.begin(), pointPlusStep.end(), [step](Doub &d) { d += step; }); //add the step to each element
+		al22(point, pointPlusStep, S, functionName, tau, d, 1);
+		nextPointSubdomain(point, inputDomainMin, inputDomainMax, step);
 
-		if (DEBUG0) std::cout << "END searching on subspace" << std::endl;
+		if (DEBUG0)
+			std::cout << "END searching on subspace" << std::endl;
 	}
 
 	return S;
 };
 
-/**********************************************************************************************//**
+/**********************************************************************************************/ /**
  * @fn	void shiftRowleft(std::vector<Doub> &xi, std::vector<Doub> &xm, std::vector<Doub> &xf, int row)
  *
  * @brief	Shift row to the left
@@ -87,26 +94,25 @@ std::vector<FixPoint> al21(Doub inputDomainMin, Doub inputDomainMax, Doub divisi
  * @param 		  	row	The row index to be shifted.
  **************************************************************************************************/
 
-void shiftRowleft(std::vector<Doub> &xi, std::vector<Doub> &xm, std::vector<Doub> &xf, int row) {
+void shiftRowleft(std::vector<Doub> &xi, std::vector<Doub> &xm, std::vector<Doub> &xf, int row)
+{
 	Doub temp1;
 	temp1 = xi[row];
 	xi[row] = xm[row];
 	xm[row] = xf[row];
 	xf[row] = temp1;
-
 };
 
-void shiftRowRight(std::vector<Doub> &xi, std::vector<Doub> &xm, std::vector<Doub> &xf, int row) {
+void shiftRowRight(std::vector<Doub> &xi, std::vector<Doub> &xm, std::vector<Doub> &xf, int row)
+{
 	Doub temp1;
 	temp1 = xf[row];
 	xf[row] = xm[row];
 	xm[row] = xi[row];
 	xi[row] = temp1;
-
 };
 
-
-/**********************************************************************************************//**
+/**********************************************************************************************/ /**
  * @fn	template <class T> void al22(StateType xi, StateType xf, std::vector<fixPoint> &S, T &functionName, Doub tau, Doub d, int deepness)
  *
  * @brief	Algorithm 2.2 of wei 2014, Generic version for N dimensional systems
@@ -129,7 +135,7 @@ void shiftRowRight(std::vector<Doub> &xi, std::vector<Doub> &xm, std::vector<Dou
 
 template <class T>
 void al22(std::vector<Doub> xi, std::vector<Doub> xf,
-	std::vector<FixPoint> &S, T &functionName, Doub tau, Doub d, int deepness)
+		  std::vector<FixPoint> &S, T &functionName, Doub tau, Doub d, int deepness)
 {
 	if (DEBUG1)
 		std::cout << deepness << std::endl;
@@ -138,12 +144,13 @@ void al22(std::vector<Doub> xi, std::vector<Doub> xf,
 		return;
 	int N = functionName.getSystemSize();
 
-	std::vector<VectorEigen> fx;  //Vector of solutions , each solution is a eigen Vector of size N 
-							   //First solution
+	std::vector<VectorEigen> fx; //Vector of solutions , each solution is a eigen Vector of size N
+								 //First solution
 	fx.push_back(evalFunInLast(functionName, xi, tau, d));
 
 	StateType first;
-	for (int i = 0; i < N; i++) {
+	for (int i = 0; i < N; i++)
+	{
 		//	(Fx[0][0] - xi, Fx[0][1] - yi, Fx[0][2] - zi);
 		first.push_back(fx[0][i] - xi[i]);
 	}
@@ -158,19 +165,21 @@ void al22(std::vector<Doub> xi, std::vector<Doub> xf,
 	//Doub mulz;
 
 	std::vector<Doub> xm;
-	for (int i = 0; i < N; i++) {
-		xm.push_back( (xf[i] + xi[i]) / 2) ;
+	for (int i = 0; i < N; i++)
+	{
+		xm.push_back((xf[i] + xi[i]) / 2);
 	}
 	//Doub xm = (xf + xi) / 2;
 	//Doub ym = (yf + yi) / 2;
 	//Doub zm = (zf + zi) / 2;
 
 	// Cartesian product of { xi,xm,xf } x { xi,xm,xf } x ... N times
-	std::vector< std::vector <Doub> > pointSpace;
-	if (N > 1) {
+	std::vector<std::vector<Doub>> pointSpace;
+	if (N > 1)
+	{
 		// Create A x A
 		pointSpace = cartesianProduct(std::vector<Doub>{xi[0], xm[0], xf[0]},
-			std::vector<Doub>{xi[1], xm[1], xf[1]});
+									  std::vector<Doub>{xi[1], xm[1], xf[1]});
 		if (N > 2)
 		{
 			for (int i = 2; i < N; i++) // Create A x A x A ...
@@ -178,28 +187,32 @@ void al22(std::vector<Doub> xi, std::vector<Doub> xf,
 		}
 	}
 
-	for (StateType point : pointSpace) { // Iterates over the all the points is size n [x1,x2,...,xn]
-				//The first element is already computed
+	for (StateType point : pointSpace)
+	{   // Iterates over the all the points is size n [x1,x2,...,xn]
+		//The first element is already computed
 		if (n == 0)
 		{
 			n = n + 1;
 			continue;
 		}
 
-		if (DEBUG1) {
+		if (DEBUG1)
+		{
 			std::cout << "Step 1" << std::endl;
 		}
 
-		//Step1				
+		//Step1
 		fx.push_back(evalFunInLast(functionName, point, tau, d));
 		//pointxyz fminus(Fx[n][0] - i, Fx[n][1] - j, Fx[n][2] - k);
 		StateType fminus;
-		for (int i = 0; i < N; i++) {
+		for (int i = 0; i < N; i++)
+		{
 			//	(Fx[0][0] - point, Fx[0][1] - yi, Fx[0][2] - zi);
 			fminus.push_back(fx[n][i] - point[i]);
 		}
 
-		if (DEBUG1) {
+		if (DEBUG1)
+		{
 			std::cout << "Step 2" << std::endl;
 		}
 		//            %Step 2 Check if first.x  differs at sign with fminus.x
@@ -208,23 +221,28 @@ void al22(std::vector<Doub> xi, std::vector<Doub> xf,
 		//muly = fminus.y*first.y;
 		//mulz = fminus.z*first.z;
 
-		for (int i = 0; i < N; i++) {
+		for (int i = 0; i < N; i++)
+		{
 			mulx[i] = fminus[i] * first[i];
 		}
 
 		//if (mulx < 0 || equal(mulx, 0)) xgood = true;
 		//if (muly < 0 || equal(muly, 0)) ygood = true;
 		//if (mulz < 0 || equal(mulz, 0)) zgood = true;
-		for (int i = 0; i < N; i++) {
-			if (mulx[i] < 0 || equal(mulx[i], 0)) xgood[i] = true;
+		for (int i = 0; i < N; i++)
+		{
+			if (mulx[i] < 0 || equal(mulx[i], 0))
+				xgood[i] = true;
 		}
 
 		//%if actually changes from 0, we take it as a sign change.
 		//if (equal(first.x, 0) && !equal(fminus.x, 0)) xgood = true;
 		//if (equal(first.y, 0) && !equal(fminus.y, 0)) ygood = true;
 		//if (equal(first.z, 0) && !equal(fminus.z, 0)) zgood = true;
-		for (int i = 0; i < N; i++) {
-			if (equal(first[i], 0) && !equal(fminus[i], 0)) xgood[i] = true;
+		for (int i = 0; i < N; i++)
+		{
+			if (equal(first[i], 0) && !equal(fminus[i], 0))
+				xgood[i] = true;
 		}
 		n = n + 1;
 	}
@@ -232,12 +250,13 @@ void al22(std::vector<Doub> xi, std::vector<Doub> xf,
 	//If every element of Fx(xi,yi,zi)-xi has the same sign returns.(The same for %y,z)
 	//if (!(xgood && ygood && zgood))  !(xgood && false && zgood) = !(false) = true, if there a false exit
 	//	return;
-	//	
+	//
 	// If there a false exit
 	if (std::find(xgood.begin(), xgood.end(), false) != xgood.end())
 		return;
 
-	if (DEBUG1) {
+	if (DEBUG1)
+	{
 		std::cout << "Step 3" << std::endl;
 	}
 	bool signChange = false;
@@ -248,7 +267,8 @@ void al22(std::vector<Doub> xi, std::vector<Doub> xf,
 	n = 0;
 	Doub Det, mult;
 
-	for (StateType point : pointSpace) {
+	for (StateType point : pointSpace)
+	{
 
 		//The first element is already computed
 		if (n == 0)
@@ -263,7 +283,8 @@ void al22(std::vector<Doub> xi, std::vector<Doub> xf,
 			std::cout << "step 4" << std::endl;
 
 		mult = Det * firstDet;
-		if (mult <= 0) {
+		if (mult <= 0)
+		{
 			// If true, then it was a change in the determinant sing
 			signChange = true;
 			//Put a break that get out of here to step 5
@@ -296,22 +317,25 @@ void al22(std::vector<Doub> xi, std::vector<Doub> xf,
 	algorithm in p. 437 Rosen- Discrete Math . We make left shift if there's a 1
 	and no shift if there's a 0. 
 	*/
-	if (signChange) {
+	if (signChange)
+	{
 		if (DEBUG1)
 			std::cout << "step 5" << std::endl;
 
 		std::vector<Doub> xiTemp;
 		std::vector<Doub> xmTemp;
 		std::vector<Doub> xfTemp;
-		std::vector<int>  bitArray(N, 0);
+		std::vector<int> bitArray(N, 0);
 		xiTemp = xi;
 		xmTemp = xm;
 		xfTemp = xf;
 
-		for (int i = 0; i < pow(2, N) - 1; i++) {
-			al22(xiTemp,xmTemp,S,functionName, tau, d, deepness - 1);
+		for (int i = 0; i < pow(2, N) - 1; i++)
+		{
+			al22(xiTemp, xmTemp, S, functionName, tau, d, deepness - 1);
 			int j = 0;
-			while (bitArray[j] == 1) {
+			while (bitArray[j] == 1)
+			{
 				bitArray[j] = 0;
 				shiftRowRight(xiTemp, xmTemp, xfTemp, j);
 				j++;
@@ -319,8 +343,7 @@ void al22(std::vector<Doub> xi, std::vector<Doub> xf,
 			bitArray[j] = 1;
 			shiftRowleft(xiTemp, xmTemp, xfTemp, j);
 		}
-		al22(xiTemp, xmTemp, S, functionName, tau, d, deepness - 1);//TODO: Necesary??
-
+		al22(xiTemp, xmTemp, S, functionName, tau, d, deepness - 1); //TODO: Necesary??
 	}
 
 	//%else
@@ -331,7 +354,8 @@ void al22(std::vector<Doub> xi, std::vector<Doub> xf,
 	{
 
 		FixPoint fixPt = newtonPoincare(functionName, point, tau, d);
-		if (fixPt.convergent) {
+		if (fixPt.convergent)
+		{
 			//If have negatives dont insert it , sometime wild -0 appear
 			// is always true than -0 < 0 is false?
 			if (pointHaveNegatives(fixPt))
@@ -347,15 +371,4 @@ END:
 	return;
 };
 
-
 #endif
-
-
-
-
-
-
-
-
-
-
