@@ -1,13 +1,13 @@
 #include <iostream>
-#include <Eigen/Dense>
-#include <boost/numeric/odeint.hpp>
+// #include <Eigen/Dense>
+// #include <boost/numeric/odeint.hpp>
 
-#include "itikBanks.h"
-#include "newtonPoincare.h"
-#include "fixPointsInSpace.h"
+// #include "itikBanks.h"
+// #include "newtonPoincare.h"
+// #include "fixPointsInSpace.h"
 
 
-
+using namespace std;
 int main()
 {
 	//      Vector3d Fx(3);  //Vector of solutions , each solution is a Vector3d
@@ -20,9 +20,12 @@ int main()
 	//      double firstDet = T.determinant();
 	//
 	//      cout<< firstDet;
-	itikBanks fun(PARAMETERS);
-	Matrix3d res = DFode_aprox(fun, stateType{ 0,1,0.06 }, 10, 0.5);
+	// itikBanks fun(PARAMETERS);
+	// Matrix3d res = DFode_aprox(fun, stateType{ 0,1,0.06 }, 10, 0.5);
 
-	std::cout << res;
+	// std::cout << res;
+
+	cout << 1e-4 <<endl;
+	cout << 0.00004e-2 <<endl;
 	std::cin.get();
 }

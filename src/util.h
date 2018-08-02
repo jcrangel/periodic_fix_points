@@ -63,6 +63,7 @@ public:
     bool stability;
     VectorEigen solution;
 
+	
     FixPoint(bool convergent_,bool stability_,VectorEigen solution_) :
         convergent(convergent_),
         stability(stability_),

@@ -111,6 +111,7 @@ int main()
         std::cout << s[0] <<","<< s[1] <<"," << s[2] << '\n';
     } while(std::next_permutation(s.begin(), s.end()));
 
+    
     double a[] = {1, 0.5, 1};
     // int n = sizeof a/sizeof a[0];
     std::cout << "\n";
