@@ -68,6 +68,7 @@ std::vector<FixPoint> al21(Doub inputDomainMin, Doub inputDomainMax, Doub divisi
 			printVector(point);
 			std::cout << "Plus step:" << step << std::endl;
 		}
+		
 		std::vector<Doub> pointPlusStep(point);
 		std::for_each(pointPlusStep.begin(), pointPlusStep.end(), [step](Doub &d) { d += step; }); //add the step to each element
 		al22(point, pointPlusStep, S, functionName, tau, d, 1);

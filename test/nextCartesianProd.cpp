@@ -15,7 +15,7 @@ void nextPointSubdomain(std::vector<double> &b, double min, double max, double s
     while (equal(b[i], max - step) ) // do it with equals
     {
         b[i] = min;
-        i++;
+        if(++i > b.size()) return;
     }
     b[i] += step;
 }
@@ -47,8 +47,8 @@ void printVectorInterval(std::vector<T> M,T step)
 }
 int main()
 {
-    double N = 4;
-    int divisions = 2;
+    double N = 3;
+    int divisions = 10;
     double min = 0, max = 1;
     double step = (max - min) / divisions;
 
@@ -57,9 +57,9 @@ int main()
 
 
     int i;
-    for( i = 0;i < std::pow(divisions  , N) ; i++ ){
+    for( i = 0;i < std::pow(divisions, N) ; i++ ){
         printVectorInterval(point,step);
         nextPointSubdomain(point, min, max, step);
     }
-    std::cout<< "Num subdomains : " <<divisions << "^" <<N << "= " << i <<std::endl; 
+    std::cout<< "Num subdomains : " <<divisions << "^" <<N << "= " << i <<std::endl;
 }
