@@ -10,6 +10,7 @@ That is the algorithms 2.1 and 2.2 of Wei 2014
 #include "util.h"
 #include "integrationode.h"
 #include "newtonpoincare.h"
+#include <algorithm>
 
 /**********************************************************************************************/ /**
  * @fn	template <class T> std::vector<fixPoint> al21(Doub inputDomainMin, Doub inputDomainMax, Doub divisions, T &functionName, Doub tau, Doub d)
@@ -60,7 +61,7 @@ std::vector<FixPoint> al21(Doub inputDomainMin, Doub inputDomainMax, Doub divisi
 	// Iterates over all subdomains
 	std::vector<Doub> point(N, inputDomainMin);
 
-	for (int i = 0; i < std::pow(divisions, N); i++)
+	for (int i = 0; i < std::pow(divisions + 1, N); i++)
 	{
 
 		if (DEBUG0)
@@ -68,7 +69,7 @@ std::vector<FixPoint> al21(Doub inputDomainMin, Doub inputDomainMax, Doub divisi
 			printVector(point);
 			std::cout << "Plus step:" << step << std::endl;
 		}
-		
+
 		std::vector<Doub> pointPlusStep(point);
 		std::for_each(pointPlusStep.begin(), pointPlusStep.end(), [step](Doub &d) { d += step; }); //add the step to each element
 		al22(point, pointPlusStep, S, functionName, tau, d, 1);
@@ -175,41 +176,42 @@ void al22(std::vector<Doub> xi, std::vector<Doub> xf,
 	//Doub zm = (zf + zi) / 2;
 
 	// Cartesian product of { xi,xm,xf } x { xi,xm,xf } x ... N times
-	std::vector<std::vector<Doub>> pointSpace;
-	if (N > 1)
-	{
-		// Create A x A
-		pointSpace = cartesianProduct(std::vector<Doub>{xi[0], xm[0], xf[0]},
-									  std::vector<Doub>{xi[1], xm[1], xf[1]});
-		if (N > 2)
-		{
-			for (int i = 2; i < N; i++) // Create A x A x A ...
-				pointSpace = cartesianProduct(pointSpace, std::vector<Doub>{xi[i], xm[i], xf[i]});
-		}
-	}
+	// std::vector<std::vector<Doub> > pointSpace;
+	// if (N > 1)
+	// {
+	// 	// Create A x A
+	// 	pointSpace = cartesianProduct(std::vector<Doub>{xi[0], xm[0], xf[0]},
+	// 								  std::vector<Doub>{xi[1], xm[1], xf[1]});
+	// 	if (N > 2)
+	// 	{
+	// 		for (int i = 2; i < N; i++) // Create A x A x A ...
+	// 			pointSpace = cartesianProduct(pointSpace, std::vector<Doub>{xi[i], xm[i], xf[i]});
+	// 	}
+	// }
 
-	for (StateType point : pointSpace)
-	{   // Iterates over the all the points is size n [x1,x2,...,xn]
+	StateType point(xi);
+	//3, there's always three options
+	for (int i = 1; i < std::pow(point.size(), 3); i++)
+	{ // Iterates over the all the points is size n [x1,x2,...,xn]
 		//The first element is already computed
-		if (n == 0)
-		{
-			n = n + 1;
-			continue;
-		}
+		nextPointSubdomain(point, xi, xf);
+		//We can actually prevent this if the modify nextPointSubdomain to work in reverse
+		StateType reversePoint(point.size());
+		std::reverse_copy(point.begin(), point.end(), reversePoint.begin());
 
 		if (DEBUG1)
 		{
 			std::cout << "Step 1" << std::endl;
 		}
 
-		//Step1
-		fx.push_back(evalFunInLast(functionName, point, tau, d));
+		//Step1									We have to use the resersed one
+		fx.push_back(evalFunInLast(functionName, reversePoint, tau, d));
 		//pointxyz fminus(Fx[n][0] - i, Fx[n][1] - j, Fx[n][2] - k);
 		StateType fminus;
 		for (int i = 0; i < N; i++)
 		{
 			//	(Fx[0][0] - point, Fx[0][1] - yi, Fx[0][2] - zi);
-			fminus.push_back(fx[n][i] - point[i]);
+			fminus.push_back(fx[n][i] - reversePoint[i]);
 		}
 
 		if (DEBUG1)
@@ -268,17 +270,16 @@ void al22(std::vector<Doub> xi, std::vector<Doub> xf,
 	n = 0;
 	Doub Det, mult;
 
-	for (StateType point : pointSpace)
-	{
-
+	point = xi;
+	//3, there's always three options
+	for (int i = 1; i < std::pow(point.size(), 3); i++)
+	{ // Iterates over the all the points is size n [x1,x2,...,xn]
 		//The first element is already computed
-		if (n == 0)
-		{
-			n = n + 1;
-			continue;
-		}
+		nextPointSubdomain(point, xi, xf);
+		StateType reversePoint(point.size());
+		std::reverse_copy(point.begin(), point.end(), reversePoint.begin());
 		//Det = (DF(toStdVectorD(Fx[n]), tau) - I).determinant();
-		Det = (DFode_aprox(functionName, point, tau, d) - I).determinant();
+		Det = (DFode_aprox(functionName, reversePoint, tau, d) - I).determinant();
 		//Step 4
 		if (DEBUG1)
 			std::cout << "step 4" << std::endl;
@@ -317,6 +318,8 @@ void al22(std::vector<Doub> xi, std::vector<Doub> xf,
 	a shift,[0,0,0,1,0,1,...] we generate all 0 & 1's permutations with 
 	algorithm in p. 437 Rosen- Discrete Math . We make left shift if there's a 1
 	and no shift if there's a 0. 
+
+	Probably this can be done using nextPointSubdomain
 	*/
 	if (signChange)
 	{
@@ -351,10 +354,16 @@ void al22(std::vector<Doub> xi, std::vector<Doub> xf,
 	//%newton
 	//%disp('step 6')
 
-	for (StateType point : pointSpace)
-	{
+	point = xi;
+	//3, there's always three options
+	for (int i = 1; i < std::pow(point.size(), 3); i++)
+	{ // Iterates over the all the points is size n [x1,x2,...,xn]
+		//The first element is already computed
+		nextPointSubdomain(point, xi, xf);
+		StateType reversePoint(point.size());
+		std::reverse_copy(point.begin(), point.end(), reversePoint.begin());
 
-		FixPoint fixPt = newtonPoincare(functionName, point, tau, d);
+		FixPoint fixPt = newtonPoincare(functionName, reversePoint, tau, d);
 		if (fixPt.convergent)
 		{
 			//If have negatives dont insert it , sometime wild -0 appear

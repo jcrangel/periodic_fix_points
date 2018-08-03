@@ -492,15 +492,44 @@ void printVectorVector(std::vector< std::vector<T> > M)
 
 }
 
+/**********************************************************************************************/ /**
+ * @fn	template<class T> void nextPointSubdomain(std::vector<Doub> &b, Doub min, Doub max, Doub step)
+ *
+ * @brief	This function ge the next subdomain point saved in b. Simulates to have an N-Dimensional
+ * 			for, i.e N-for's nested iterating i=min to max with increments of step 
+ **************************************************************************************************/
+
 void nextPointSubdomain(std::vector<Doub> &b, Doub min, Doub max, Doub step)
 {
 	int i = 0;
 
-	while (equal(b[i], max - step)) // do it with equals
+	while (equal(b[i], max )) // do it with equals
 	{
 		b[i] = min;
-		i++;
+		if (++i >= b.size())
+			return; // prevents to go further of array size
 	}
+	b[i] += step;
+}
+/**********************************************************************************************/ /**
+ *
+ * @brief	This function ge the next subdomain point saved in b. Simulates to have an N-Dimensional
+ * 			for, i.e N-for's nested iterating i=min to max with increments of step. This work for 
+ * 			diferent values for each index given by the vectors xmin and xmax. See notes p.18  
+ **************************************************************************************************/
+
+template <class T>
+void nextPointSubdomain(T &b, T xmin, T xmax)
+{
+	int i = 0;
+	double step;
+	while (equal(b[i], xmax[i])) // do it with equals
+	{
+		b[i] = xmin[i];
+		if (++i >= b.size())
+			return; // prevents to go further of array size
+	}
+	step = (xmax[i] - xmin[i]) / 2;
 	b[i] += step;
 }
 
