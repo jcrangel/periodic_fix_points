@@ -194,6 +194,7 @@ void al22(std::vector<Doub> xi, std::vector<Doub> xf,
 	for (int i = 1; i < std::pow(point.size(), 3); i++)
 	{ // Iterates over the all the points is size n [x1,x2,...,xn]
 		//The first element is already computed
+
 		nextPointSubdomain(point, xi, xf);
 		//We can actually prevent this if the modify nextPointSubdomain to work in reverse
 		StateType reversePoint(point.size());
@@ -201,7 +202,7 @@ void al22(std::vector<Doub> xi, std::vector<Doub> xf,
 
 		if (DEBUG1)
 		{
-			std::cout << "Step 1" << std::endl;
+			std::cout << n <<" : Step 1" << std::endl;
 		}
 
 		//Step1									We have to use the resersed one

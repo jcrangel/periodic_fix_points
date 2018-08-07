@@ -40,7 +40,7 @@ FixPoint newtonPoincare(T &fun, StateType initialCondition, Doub tau, Doub d) {
 
 		//  STIFF INTEGRATION simple------------------
 		StateType u(N);
-		integrateSystem(fun, initialCondition, u, xp[0], xp[1]);
+		integrateStiffSystem(fun, initialCondition, u, xp[0], xp[1]);
 		Pxk = toEigenVector(u);
 		//  STIFF INTEGRATION END ------------------
 

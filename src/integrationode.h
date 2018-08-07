@@ -97,7 +97,7 @@ void integrateStiffSystem(T &system, StateType initialCondition, StateType &x, D
 	//std::copy(initialCondition.begin(), initialCondition.end(), v.begin());
 
 	size_t num_of_steps = integrate_const(make_dense_output< rosenbrock4< Doub > >(1.0e-6, 1.0e-6),
-		std::make_pair(system, system),
+		std::make_pair(system, system ),
 		v, t0, tf, 0.01);
 
 	//std::vector<Doub> res(STATE_SIZE);

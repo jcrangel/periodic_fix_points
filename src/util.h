@@ -30,7 +30,7 @@ Common data type definition and functions for vector manipulation.
 
 
 #define DEBUG0 true
-#define DEBUG1 false
+#define DEBUG1 true
 
 /**********************************************************************************************//**
  * @typedef	std::vector<Doub> VecDoub_IO
@@ -389,7 +389,7 @@ VectorEigen evalFunInLast(T &functionName, StateType initialCondition, Doub tau,
 	initialCondition[controlIndex] = initialCondition[controlIndex] + d;
 	int N = functionName.getSystemSize();
 	std::vector<Doub> res(N);
-	integrateSystem(functionName, initialCondition, res, 0, tau);
+	integrateStiffSystem(functionName, initialCondition, res, 0, tau);
 
 	//To create the VectorEigenfrom the std::vector
 	//Doub* ptr = &res[0];
