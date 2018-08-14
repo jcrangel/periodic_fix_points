@@ -63,7 +63,6 @@ std::vector<FixPoint> al21(Doub inputDomainMin, Doub inputDomainMax, Doub divisi
 
 	for (int i = 0; i < std::pow(divisions + 1, N); i++)
 	{
-
 		if (DEBUG0)
 		{
 			printVector(point);
@@ -137,7 +136,7 @@ void shiftRowRight(std::vector<Doub> &xi, std::vector<Doub> &xm, std::vector<Dou
 
 template <class T>
 void al22(std::vector<Doub> xi, std::vector<Doub> xf,
-		  std::vector<FixPoint> &S, T &functionName, Doub tau, Doub d, int deepness)
+	std::vector<FixPoint> &S, T &functionName, Doub tau, Doub d, int deepness)
 {
 	if (DEBUG1)
 		std::cout << deepness << std::endl;
@@ -202,7 +201,7 @@ void al22(std::vector<Doub> xi, std::vector<Doub> xf,
 
 		if (DEBUG1)
 		{
-			std::cout << n <<" : Step 1" << std::endl;
+			std::cout << n << " : Step 1" << std::endl;
 		}
 
 		//Step1									We have to use the resersed one
@@ -302,23 +301,23 @@ void al22(std::vector<Doub> xi, std::vector<Doub> xf,
 	For a 3D dimentional system we have the columns:
 	xi		xm		xf
 	0.1		0.3		0.5  x<--
-	0.1		0.3		0.5  y<-- 
+	0.1		0.3		0.5  y<--
 	0.1		0.3		0.5	 z<--
-	
+
 	and we send to al22(xi , xm ...) with xi and xm as the initial
 	and final column of data. First row for the first dependent variable
-	e.g x, the second for y, and so on. 
-	For obtain one subdomain we shift the each row to the left : 
+	e.g x, the second for y, and so on.
+	For obtain one subdomain we shift the each row to the left :
 	xi		xm		xf
 	0.3		0.5  	0.1		<--
-	0.1		0.3		0.5 
-	0.1		0.3		0.5	 
-	To send all possible subdomains we make all possible permutations 
+	0.1		0.3		0.5
+	0.1		0.3		0.5
+	To send all possible subdomains we make all possible permutations
 	of shifts. In this case are 2^3 = 8 in total. Each shift is controlled
 	in a array of shifts <<bitArray>> 0 if there's no shift and 1 if there's
-	a shift,[0,0,0,1,0,1,...] we generate all 0 & 1's permutations with 
+	a shift,[0,0,0,1,0,1,...] we generate all 0 & 1's permutations with
 	algorithm in p. 437 Rosen- Discrete Math . We make left shift if there's a 1
-	and no shift if there's a 0. 
+	and no shift if there's a 0.
 
 	Probably this can be done using nextPointSubdomain
 	*/

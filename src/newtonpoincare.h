@@ -9,8 +9,6 @@ Procedures to obtain the jacobian following the procedure in eq (6)&(7) of the
 #include "util.h"
 #include "integrationode.h"
 
-
-
 //Gets the jacobian following the procedure in eq (6) & (7) of the
 //paper Wei 2014
 template <class T>
@@ -26,21 +24,20 @@ FixPoint newtonPoincare(T &fun, StateType initialCondition, Doub tau, Doub d) {
 	VectorEigen Pxk;
 	MatrixEigen df;
 	MatrixEigen A;
-	MatrixEigen I = MatrixEigen::Identity(N,N);
+	MatrixEigen I = MatrixEigen::Identity(N, N);
 	VectorEigen y;
 	VectorEigen Xplus;
 
-
 	//StateType initCond;
 
-	while (n < maxStep) {                  
+	while (n < maxStep) {
 		df = DFode_aprox(fun, toStateType(Xk), tau, d);  //Jacobian
 		initialCondition = toStateType(Xk);
 		initialCondition[controlIndex] = initialCondition[controlIndex] + d;
 
 		//  STIFF INTEGRATION simple------------------
 		StateType u(N);
-		integrateStiffSystem(fun, initialCondition, u, xp[0], xp[1]);
+		integrateSystem(fun, initialCondition, u, xp[0], xp[1]);
 		Pxk = toEigenVector(u);
 		//  STIFF INTEGRATION END ------------------
 
@@ -55,7 +52,6 @@ FixPoint newtonPoincare(T &fun, StateType initialCondition, Doub tau, Doub d) {
 
 		Xk = Xplus;  //%update x
 		n++;
-
 	}
 	// 0 means unstable
 	Doub stability = 0;
@@ -65,14 +61,12 @@ FixPoint newtonPoincare(T &fun, StateType initialCondition, Doub tau, Doub d) {
 
 		if (isStable(df))
 			stability = 1;
-
 	}
 	FixPoint ss(convergence, stability, Xk);
 	return ss;
 }
 
-
-//Calculate the jacobian of the poincare map given by equations (6) & (7) 
+//Calculate the jacobian of the poincare map given by equations (6) & (7)
 // N-Dim system
 template <class T>
 MatrixEigen DFode_aprox(T &fun, StateType initialCondition,
@@ -81,12 +75,11 @@ MatrixEigen DFode_aprox(T &fun, StateType initialCondition,
 	const Doub EPS = 1.0e-8;
 	//int n = initialCondition.size();
 	int n = fun.getSystemSize();
-	MatrixEigen df(n,n);
+	MatrixEigen df(n, n);
 	StateType xh = initialCondition;
 	VectorEigen fvec = evalFunInLast(fun, initialCondition, tau, d);
 
-
-	for (int j = 0; j<n; j++)
+	for (int j = 0; j < n; j++)
 	{
 		Doub temp = xh[j];
 		Doub h = EPS * abs(temp);
@@ -101,6 +94,5 @@ MatrixEigen DFode_aprox(T &fun, StateType initialCondition,
 	}
 	return df;
 };
-
 
 #endif

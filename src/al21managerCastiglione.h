@@ -3,8 +3,9 @@
 /**
 This is acts as a interface for algorithm 21 for managing data, etc.
 
+
 **/
-#include "murinemodelv2.h"
+#include "castiglione.h"
 #include "fixpointsinspace.h"
 #include <fstream>
 #include <iomanip>
@@ -12,47 +13,39 @@ This is acts as a interface for algorithm 21 for managing data, etc.
 
 void runAl21()
 {
-	Doub xmin = 1;// 0 zero give division over zero..
-	Doub xmax = 1e10;
-	Doub M = 10;
-	Doub aH, MuH, rH, KH, aC, MuC, rC, KC, KT, MuD, rI, MuIC, MuI;
-	Doub rT, aT, eT, hT, aTBeta, eTBeta, rTBeta, MuBeta, aGammaC;
-	Doub MuGamma, gMl, aMlGamma, eMlGamma, MuMl;
 
-	aH = 1e-4;
-	MuH = 0.005;
-	rH = 10e-2;
-	KH = 1;
-	aC = 1e-4;
-	MuC = 0.01925;
-	rC = 0.00004e-2;
-	KC = 1;
-	KT = 1e12;
-	MuD = 0.009625;
-	rI = 1e-2;
-	MuIC = 1e-7;
-	MuI = 1e-2;
-	rT = 0.002;
-	aT = 0.1136;
-	eT = 50;
-	hT = 5.2e5;
-	aTBeta = 0.69;
-	eTBeta = 1e4;
-	rTBeta = 5.57e-6;
-	MuBeta = 6.93;
-	aGammaC = 1.02e-4;
-	MuGamma = 0.102;
-	gMl = 1.44;
-	aMlGamma = 2.89;
-	eMlGamma = 3.38e5;
-	MuMl = 0.0144;
+	Doub xmin = 0;// 0 zero give division over zero..
+	Doub xmax = 1;
+	Doub M = 2;
+	Doub a0, b0, c0, d0, f0;
+	Doub a1, b1, c1, d1, f1;
+	Doub d2, f2, e2;
+	Doub e3;
+	Doub a4, c4, e4;
 
-	std::vector<Doub> PARAMETERS = { aH, MuH, rH, KH, aC, MuC, rC, KC, KT, MuD, rI, MuIC,
-									MuI, rT, aT, eT, hT, aTBeta, eTBeta, rTBeta, MuBeta, aGammaC, MuGamma, gMl, aMlGamma, eMlGamma, MuMl };
-	Doub ef = 0.05;
-	Doub tau = 400.4, dose = 140000;
+	a0 = 10e-4;
+	b0 = 0.005;
+	c0 = 10;
+	d0 = 10e-2;
+	f0 = 1;
+	a1 = 10e-4;
+	b1 = 0.005;
+	c1 = 10;
+	d1 = 10e-2;
+	f1 = 1;
+	d2 = 0.02;
+	e2 = 0.1;
+	f2 = 1;
+	e3 = 0.1;
+	a4 = 10e-2;
+	c4 = 10e-7;
+	e4 = 10e-2;
+
+	std::vector<Doub> PARAMETERS = { a0, b0, c0, d0, f0, a1, b1, c1, d1, f1,
+									 d2, f2, e2, e3, a4, c4, e4 };
+	Doub tau = 1000, dose = 1;
 	//std::cin >> tau >> d;
-	MurineModelv2 fun(PARAMETERS);
+	Castiglione fun(PARAMETERS);
 	std::vector<FixPoint> S;
 	std::vector<double> v;
 
@@ -66,7 +59,7 @@ void runAl21()
 	lcout << fun.getSystemSize() << " intervals \n";
 	lcout << "M: " << M << "tau: " << tau << "d: " << dose << "\n";
 	lcout << "Parameters:\n ";
-	lcout << "(a12,a13,r2,a21,r3,k3,a31,d3)=(";
+	lcout << "(a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(";
 	for (Doub i : PARAMETERS)
 		lcout << i << ",";
 	lcout << ")\nPoints Founded:\n";

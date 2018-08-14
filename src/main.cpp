@@ -6,12 +6,22 @@ Note:
   for everything
 
 */
-#include "al21manager.h"
+#include "al21managerCastiglione.h"
+#include "util.h"
+#include <chrono>
+#include <ctime>
+#include <iostream>
 
-int main(){
-
-
+int main() {
+	auto start = std::chrono::system_clock::now();
 	runAl21();
+	auto end = std::chrono::system_clock::now();
 
+	std::chrono::duration<double> elapsed_seconds = end - start;
+	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+
+	LogAndStdout lcout("points_log.txt");
+	lcout << "finished computation at " << std::ctime(&end_time)
+		<< "elapsed time: " << elapsed_seconds.count() << "s\n";
 	return 0;
 }

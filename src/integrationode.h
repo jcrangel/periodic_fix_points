@@ -5,11 +5,9 @@ All the functions related to integration of diferential equations
 #ifndef INTEGRATIONODE_H
 #define INTEGRATIONODE_H
 
-
 #include "util.h"
 
 using namespace boost::numeric::odeint;
-
 
 /**********************************************************************************************//**
  * @struct	push_back_state_and_time
@@ -41,12 +39,11 @@ struct push_back_state_and_time
 	}
 };
 
-
 /**********************************************************************************************//**
  * @fn	template <class T> void integrateSystem(T &system, StateType initialCondition, StateType &x, Doub t0, Doub tf)
  *
  * @brief	Integrate a ODE system and returns the last value of the integration in x In the stiff version.
- * 			the system should be a class that have the Jacobian as a functor. 
+ * 			the system should be a class that have the Jacobian as a functor.
  *
  * @author	Iron
  * @date	7/31/2018
@@ -61,22 +58,18 @@ struct push_back_state_and_time
 
 template <class T>
 void integrateSystem(T &system, StateType initialCondition, StateType &x, Doub t0, Doub tf) {
-
 	typedef runge_kutta_dopri5<StateType> error_stepper_type;
 
 	size_t steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
 		system, initialCondition, t0, tf, 0.001);
 	x = initialCondition;
-
-
 }
-
 
 /**********************************************************************************************//**
  * @fn	template <class T> void integrateStiffSystem(T &system, StateType initialCondition, StateType &x, Doub t0, Doub tf)
  *
  * @brief	Integrate a ODE system and returns the last value of the integration in x.System is stiff version
- * 			 the system should be a class that have the Jacobian as a functor. 
+ * 			 the system should be a class that have the Jacobian as a functor.
  *
  * @author	Iron
  * @date	7/31/2018
@@ -91,18 +84,16 @@ void integrateSystem(T &system, StateType initialCondition, StateType &x, Doub t
 
 template <class T>
 void integrateStiffSystem(T &system, StateType initialCondition, StateType &x, Doub t0, Doub tf) {
-
 	VectorBoost v = toBoostVectorD(initialCondition);;
 
 	//std::copy(initialCondition.begin(), initialCondition.end(), v.begin());
 
 	size_t num_of_steps = integrate_const(make_dense_output< rosenbrock4< Doub > >(1.0e-6, 1.0e-6),
-		std::make_pair(system, system ),
+		std::make_pair(system, system),
 		v, t0, tf, 0.01);
 
 	//std::vector<Doub> res(STATE_SIZE);
 	std::copy(v.begin(), v.end(), x.begin());
-
 }
 
 //Integrate a ODE system and returns the last value of the integration in x
@@ -111,7 +102,6 @@ void integrateStiffSystem(T &system, StateType initialCondition, StateType &x, D
 template <class T>
 void integrateStiffSystem(T &system, StateType initialCondition,
 	Doub t0, Doub tf, std::vector<StateType> &u, StateType &t) {
-
 	VectorBoost v = toBoostVectorD(initialCondition);
 
 	//std::copy(initialCondition.begin(), initialCondition.end(), v.begin());
@@ -119,11 +109,6 @@ void integrateStiffSystem(T &system, StateType initialCondition,
 	size_t num_of_steps = integrate_const(make_dense_output< rosenbrock4< Doub > >(1.0e-6, 1.0e-6),
 		std::make_pair(system, system),
 		v, t0, tf, 0.01, push_back_state_and_time(u, t));
-
 }
-
-
-
-
 
 #endif

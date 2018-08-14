@@ -7,12 +7,9 @@ Common data type definition and functions for vector manipulation.
 
 */
 
-
 #ifndef ALL_H
 ///< .
 #define ALL_H
-
-
 
 #include <iostream>
 #include <fstream>
@@ -28,9 +25,8 @@ Common data type definition and functions for vector manipulation.
 
 //#include <boost/math/interpolators/barycentric_rational.hpp> for not aproximate jacobian
 
-
 #define DEBUG0 true
-#define DEBUG1 true
+#define DEBUG1 false
 
 /**********************************************************************************************//**
  * @typedef	std::vector<Doub> VecDoub_IO
@@ -47,7 +43,7 @@ typedef Eigen::MatrixXd MatrixEigen;
 typedef const std::vector<Doub> VecDoub_I; // Utility vector for input
 typedef std::vector<Doub>  VecDoub_IO;// Utility vector for input & ouput
 /**********************************************************************************************//**
- * @class	fixPoint, The class representing a fixpoint [x,y,z] and if info about 
+ * @class	fixPoint, The class representing a fixpoint [x,y,z] and if info about
 //convergence and stability
  *
  * @brief	A fix point.
@@ -59,22 +55,20 @@ typedef std::vector<Doub>  VecDoub_IO;// Utility vector for input & ouput
 class FixPoint
 {
 public:
-    bool convergent;
-    bool stability;
-    VectorEigen solution;
+	bool convergent;
+	bool stability;
+	VectorEigen solution;
 
-	
-    FixPoint(bool convergent_,bool stability_,VectorEigen solution_) :
-        convergent(convergent_),
-        stability(stability_),
-        solution(solution_) {}
-
+	FixPoint(bool convergent_, bool stability_, VectorEigen solution_) :
+		convergent(convergent_),
+		stability(stability_),
+		solution(solution_) {}
 };
 
 /**********************************************************************************************//**
  * @fn	template <class T> void transpose(const T u, std::vector < StateType > & state )
  *
- * @brief	Transpose a matrix of made with std::vector's. Not being used in the current version. 
+ * @brief	Transpose a matrix of made with std::vector's. Not being used in the current version.
  *
  * @author	Iron
  * @date	7/31/2018
@@ -85,17 +79,15 @@ public:
  **************************************************************************************************/
 
 template <class T>
-void transpose(const T u, std::vector < StateType > & state )
+void transpose(const T u, std::vector < StateType > & state)
 {
-    //Copy the data as transpose
-    //for some reason in windows we need i < u.size in ubuntu ins i <= u.size
-    for(int i = 0; i < u.size() ; i++)
-							// STATE_SIZE before, posibly a source of bugs
-        for (int j = 0; j < state.size() ; j++ )
-            state[j][i] = u[i][j];
+	//Copy the data as transpose
+	//for some reason in windows we need i < u.size in ubuntu ins i <= u.size
+	for (int i = 0; i < u.size(); i++)
+		// STATE_SIZE before, posibly a source of bugs
+		for (int j = 0; j < state.size(); j++)
+			state[j][i] = u[i][j];
 }
-
-
 
 /**********************************************************************************************//**
  * @fn	MatrixEigen reshapeVectorToMatrix(const T x)
@@ -112,21 +104,19 @@ void transpose(const T u, std::vector < StateType > & state )
 template <class T>
 MatrixEigen reshapeVectorToMatrix(const T x)
 {
+	int N = sqrt(x.size());
+	MatrixEigen A(N, N);
 
-    int N = sqrt(x.size());
-    MatrixEigen A(N,N);
+	for (int i = 0; i < N; i++)
+	{
+		for (int j = 0; j < N; j++)
+		{
+			A(i, j) = x[i*N + j];
+		}
+	}
 
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j < N; j++)
-        {
-            A(i, j) = x[i*N + j];
-        }
-    }
-
-    return A;
+	return A;
 }
-
 
 //
 // the matrix is stable()true.
@@ -134,7 +124,7 @@ MatrixEigen reshapeVectorToMatrix(const T x)
 /**********************************************************************************************//**
  * @fn	bool isStable(MatrixEigen A)
  *
- * @brief	Query if Matrix 'A' is stable. Calculate all eigenvalues of matrix A, if all of them 
+ * @brief	Query if Matrix 'A' is stable. Calculate all eigenvalues of matrix A, if all of them
  * 			are less than 1, is stable.
  *
  * @author	Iron
@@ -147,18 +137,18 @@ MatrixEigen reshapeVectorToMatrix(const T x)
 
 bool isStable(MatrixEigen A)
 {
-    VectorcEigen eivals = A.eigenvalues();
-    for (int i = 0; i < eivals.size(); ++i)
-        if (std::abs(eivals[i]) >= 1)
-            return false;
+	VectorcEigen eivals = A.eigenvalues();
+	for (int i = 0; i < eivals.size(); ++i)
+		if (std::abs(eivals[i]) >= 1)
+			return false;
 
-    return true;
+	return true;
 };
 
 /**********************************************************************************************//**
  * @fn	bool equal(Doub A, Doub B, Doub epsilon = 0.000005f)
  *
- * @brief	Cheks for aproximate  equality. 
+ * @brief	Cheks for aproximate  equality.
  *
  * @author	Iron
  * @date	7/25/2018
@@ -172,7 +162,7 @@ bool isStable(MatrixEigen A)
 
 bool equal(Doub A, Doub B, Doub epsilon = 0.000005f)
 {
-    return (fabs(A - B) < epsilon);
+	return (fabs(A - B) < epsilon);
 }
 
 /**********************************************************************************************//**
@@ -190,12 +180,11 @@ bool equal(Doub A, Doub B, Doub epsilon = 0.000005f)
 
 StateType toStateType(const VectorEigen v)
 {
-    std::vector<Doub> v2;
-    v2.resize(v.size());
-    VectorEigen::Map(&v2[0], v.size()) = v;
-    return v2;
+	std::vector<Doub> v2;
+	v2.resize(v.size());
+	VectorEigen::Map(&v2[0], v.size()) = v;
+	return v2;
 }
-
 
 /**********************************************************************************************//**
  * @fn	void toStdVectorD(const Vector3d v, StateType &w)
@@ -218,7 +207,7 @@ void toStateType(const VectorEigen v, StateType &w)
 /**********************************************************************************************//**
  * @fn	std::vector<Doub> toStdVectorD(VectorBoost v)
  *
- * @brief	Converts a vector drom Boost libs to a standard vector. 
+ * @brief	Converts a vector drom Boost libs to a standard vector.
  *
  * @author	Iron
  * @date	7/25/2018
@@ -279,7 +268,7 @@ VectorEigen toEigenVector(StateType v) {
 /**********************************************************************************************//**
  * @fn	bool pointIsInSet(fixPoint p, std::vector<fixPoint> S)
  *
- * @brief	Check if the fixpoint is in the Set S . 
+ * @brief	Check if the fixpoint is in the Set S .
  *
  * @author	Iron
  * @date	7/25/2018
@@ -292,19 +281,17 @@ VectorEigen toEigenVector(StateType v) {
 
 bool pointIsInSet(FixPoint p, std::vector<FixPoint> S)
 {
-	for (FixPoint i: S) {
+	for (FixPoint i : S) {
 		//Check
 		int j;
 		//STATE_SIZE before
 		for (j = 0; j < p.solution.size(); j++) {
-
-			if ( !equal(i.solution[j],p.solution[j]) )
+			if (!equal(i.solution[j], p.solution[j]))
 				break;	//Stop comparing, vectors ain't equal
 		}
 		//STATE_SIZE before
 		if (j == p.solution.size()) // never break, then all were equal
 			return true;
-
 	}
 	return false;
 }
@@ -330,12 +317,11 @@ bool pointHaveNegatives(FixPoint p) {
 	return false;
 }
 
-
 /**********************************************************************************************//**
  * @class	LogAndStdout
  *
  * @brief	A log and stdout. Warper for writing both to the console and to a file.
- * 			
+ *
  *
  * @author	Iron
  * @date	7/25/2018
@@ -349,7 +335,7 @@ public:
 	/**********************************************************************************************//**
 	 * @fn	TODO::LogAndStdout(const std::string fileName)
 	 *
-	 * @brief	Opens the file for writing and appending. 
+	 * @brief	Opens the file for writing and appending.
 	 *
 	 * @author	Iron
 	 * @date	7/25/2018
@@ -374,7 +360,7 @@ public:
 /**********************************************************************************************//**
  * @fn	template <class T> VectorEigenevalFunInLast(T &functionName, StateType initialCondition, Doub tau, Doub d)
  *
- * @brief	Evaluate F(x,y,z)  at the final time.  
+ * @brief	Evaluate F(x,y,z)  at the final time.
  *
  * @author	Iron
  * @date	7/25/2018
@@ -389,7 +375,7 @@ VectorEigen evalFunInLast(T &functionName, StateType initialCondition, Doub tau,
 	initialCondition[controlIndex] = initialCondition[controlIndex] + d;
 	int N = functionName.getSystemSize();
 	std::vector<Doub> res(N);
-	integrateStiffSystem(functionName, initialCondition, res, 0, tau);
+	integrateSystem(functionName, initialCondition, res, 0, tau);
 
 	//To create the VectorEigenfrom the std::vector
 	//Doub* ptr = &res[0];
@@ -454,18 +440,16 @@ std::vector< std::vector<T> > cartesianProduct(const std::vector<std::vector<T>>
 			AB.insert(AB.end(), B[j]);
 
 			prod.push_back(AB);
-
 		}
 	return prod;
 }
 
-
 template<class T>
 void printVector(std::vector<T> M)
 {
-		for (T j : M)
-			std::cout << j << " ";
-		std::cout << "\n";
+	for (T j : M)
+		std::cout << j << " ";
+	std::cout << "\n";
 }
 
 /**********************************************************************************************//**
@@ -483,27 +467,25 @@ void printVector(std::vector<T> M)
 template<class T>
 void printVectorVector(std::vector< std::vector<T> > M)
 {
-
 	for (std::vector<T> i : M) {
 		for (T j : i)
 			std::cout << j << " ";
 		std::cout << "\n";
 	}
-
 }
 
 /**********************************************************************************************/ /**
  * @fn	template<class T> void nextPointSubdomain(std::vector<Doub> &b, Doub min, Doub max, Doub step)
  *
  * @brief	This function ge the next subdomain point saved in b. Simulates to have an N-Dimensional
- * 			for, i.e N-for's nested iterating i=min to max with increments of step 
+ * 			for, i.e N-for's nested iterating i=min to max with increments of step
  **************************************************************************************************/
 
 void nextPointSubdomain(std::vector<Doub> &b, Doub min, Doub max, Doub step)
 {
 	int i = 0;
 
-	while (equal(b[i], max )) // do it with equals
+	while (equal(b[i], max)) // do it with equals
 	{
 		b[i] = min;
 		if (++i >= b.size())
@@ -514,8 +496,8 @@ void nextPointSubdomain(std::vector<Doub> &b, Doub min, Doub max, Doub step)
 /**********************************************************************************************/ /**
  *
  * @brief	This function ge the next subdomain point saved in b. Simulates to have an N-Dimensional
- * 			for, i.e N-for's nested iterating i=min to max with increments of step. This work for 
- * 			diferent values for each index given by the vectors xmin and xmax. See notes p.18  
+ * 			for, i.e N-for's nested iterating i=min to max with increments of step. This work for
+ * 			diferent values for each index given by the vectors xmin and xmax. See notes p.18
  **************************************************************************************************/
 
 template <class T>
