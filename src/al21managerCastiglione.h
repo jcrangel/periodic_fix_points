@@ -62,11 +62,16 @@ void runAl21()
 	lcout << "(a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(";
 	for (Doub i : PARAMETERS)
 		lcout << i << ",";
-	lcout << ")\nPoints Founded:\n";
+	lcout << ")\n"<< S.size()<<" Points Founded:\n";
 	lcout << std::fixed << std::setprecision(6);
 	for (FixPoint i : S)
 	{
-		lcout << i.solution[0] << "\t" << i.solution[1] << "\t" << i.solution[2] << "\t" << i.stability << "\n";
+		lcout << i.solution <<"\n-----------------------\n";
+		if (i.stability)
+			lcout << "Stable\n";
+		else
+			lcout << "Unstable\n";
+		//lcout << i.solution[0] << "\t" << i.solution[1] << "\t" << i.solution[2] << "\t" << i.stability << "\n";
 	}
 	/*std::cin.get();*/
 }

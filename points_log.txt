@@ -465,3 +465,50 @@ Points Founded:
 0.206562	0.205908	0.000000	1
 finished computation at Tue Aug 14 16:25:48 2018
 elapsed time: 6.20836s
+========================================================
+Working with
+X=[0 , 1 ]
+5 intervals 
+M: 2tau: 1000d: 1
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.001,0.005,10,0.1,1,0.001,0.005,10,0.1,1,0.02,1,0.1,0.1,0.1,1e-06,0.1,)
+Points Founded:
+0.206562
+0.205908
+0.000000
+0.000000
+0.0000001
+finished computation at Wed Aug 15 20:36:46 2018
+elapsed time: 6.14435s
+========================================================
+Working with
+X=[0 , 1 ]
+5 intervals 
+M: 2tau: 1000d: 1
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.001,0.005,10,0.1,1,0.001,0.005,10,0.1,1,0.02,1,0.1,0.1,0.1,1e-06,0.1,)
+Points Founded:
+0.206562
+0.205908
+0.000000
+0.000000
+0.000000
+Stable
+finished computation at Wed Aug 15 20:42:10 2018
+elapsed time: 6.11235s
+========================================================
+Working with
+X=[0 , 1 ]
+5 intervals 
+M: 2tau: 1000d: 1
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.001,0.005,10,0.1,1,0.001,0.005,10,0.1,1,0.02,1,0.1,0.1,0.1,1e-06,0.1,)
+1 Points Founded:
+0.206562
+0.205908
+0.000000
+0.000000
+0.000000
+-----------------------Stable
+finished computation at Wed Aug 15 20:50:56 2018
+elapsed time: 6.39537s
