@@ -68,6 +68,17 @@ public:
 		dxdt[2] = (d2 * M*(1 - M / f2)) - e2 * M*C;
 		dxdt[3] = -e3 * D*C;
 		dxdt[4] = a4 * H*D - c4 * C*I - e4 * I;
+		//Doub H = x[2];
+		//Doub C = x[3];
+		//Doub M = x[0];
+		//Doub D = x[1];
+		//Doub I = x[4];
+
+		//dxdt[2] = a0 - b0 * H + c0 * D*(d0 * H*(1 - H / f0));
+		//dxdt[3] = a1 - b1 * C + c1 * I*(M + D)*(d1 * C*(1 - C / f1));
+		//dxdt[0] = (d2 * M*(1 - M / f2)) - e2 * M*C;
+		//dxdt[1] = -e3 * D*C;
+		//dxdt[4] = a4 * H*D - c4 * C*I - e4 * I;
 	}
 	/**
  * This is needed for the Stiff integrator

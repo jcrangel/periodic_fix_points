@@ -16,7 +16,7 @@ void runAl21()
 
 	Doub xmin = 0;// 0 zero give division over zero..
 	Doub xmax = 1;
-	Doub M = 2;
+	Doub M = 10;
 	Doub a0, b0, c0, d0, f0;
 	Doub a1, b1, c1, d1, f1;
 	Doub d2, f2, e2;
@@ -54,10 +54,10 @@ void runAl21()
 
 	LogAndStdout lcout("points_log.txt");
 	lcout << "========================================================\n";
-	lcout << "Working with\n";
+	lcout << "Castiglione model Working with\n";
 	lcout << "X=[" << xmin << " , " << xmax << " ]\n";
 	lcout << fun.getSystemSize() << " intervals \n";
-	lcout << "M: " << M << "tau: " << tau << "d: " << dose << "\n";
+	lcout << "M: " << M << ", tau: " << tau << ", d: " << dose << "\n";
 	lcout << "Parameters:\n ";
 	lcout << "(a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(";
 	for (Doub i : PARAMETERS)

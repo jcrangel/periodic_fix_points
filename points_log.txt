@@ -512,3 +512,89 @@ Parameters:
 -----------------------Stable
 finished computation at Wed Aug 15 20:50:56 2018
 elapsed time: 6.39537s
+========================================================
+Working with
+X=[0 , 1 ]
+5 intervals 
+M: 2tau: 1000d: 1
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.001,0.005,10,0.1,1,0.001,0.005,10,0.1,1,0.02,1,0.1,0.1,0.1,1e-06,0.1,)
+1 Points Founded:
+0.206562
+0.205908
+0.000000
+0.000000
+0.000000
+-----------------------
+Stable
+finished computation at Tue Sep  4 19:47:22 2018
+elapsed time: 5.90534s
+========================================================
+Castiglione model Working with
+X=[0 , 1 ]
+5 intervals 
+M: 2, tau: 200 d: 1
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.001,0.005,10,0.1,1,0.001,0.005,10,0.1,1,0.02,1,0.1,0.1,0.1,1e-06,0.1,)
+1 Points Founded:
+0.551676
+0.513203
+0.000000
+0.000001
+0.000001
+-----------------------
+Stable
+finished computation at Tue Sep  4 20:59:46 2018
+elapsed time: 3.75121s
+========================================================
+Castiglione model Working with
+X=[0 , 1 ]
+5 intervals 
+M: 2, tau: 400 d: 0.4
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.001,0.005,10,0.1,1,0.001,0.005,10,0.1,1,0.02,1,0.1,0.1,0.1,1e-06,0.1,)
+1 Points Founded:
+0.347045
+0.257010
+0.000000
+0.000000
+0.000000
+-----------------------
+Stable
+finished computation at Wed Sep  5 18:24:05 2018
+elapsed time: 15.5229s
+========================================================
+Castiglione model Working with, here we changed the order 
+of the variables, bt still find the same point
+X=[0 , 1 ]
+5 intervals 
+M: 2, tau: 1000, d: 1
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.001,0.005,10,0.1,1,0.001,0.005,10,0.1,1,0.02,1,0.1,0.1,0.1,1e-06,0.1,)
+1 Points Founded:
+0.000000
+0.000000
+0.200000
+0.206784
+0.000000
+-----------------------
+Unstable
+finished computation at Wed Sep  5 20:37:45 2018
+elapsed time: 4.84728s
+========================================================
+Castiglione model Working with
+X=[0 , 1 ]
+5 intervals 
+M: 10, tau: 1000, d: 1
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.001,0.005,10,0.1,1,0.001,0.005,10,0.1,1,0.02,1,0.1,0.1,0.1,1e-06,0.1,)
+1 Points Founded:
+0.206562
+0.205908
+0.000000
+0.000000
+0.000000
+-----------------------
+Stable
+finished computation at Wed Sep  5 21:22:04 2018
+elapsed time: 2395.09s
