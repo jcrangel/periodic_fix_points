@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iostream>
+
 // #include <complex>
 
 // #include <Eigen/Core>
@@ -19,6 +20,21 @@
 	
 // 	return true;
 // }
+#include <map>
+#include <iomanip>
+#include <sstream>
+
+String keystr(Doub a, Doub b, int precision = 6){
+	strings<<tream stream;
+	stream << fixed << setprecision(precision) <<
+	 String as = std::to_string(a);
+	String bs =  std::to_string(b);
+
+	return
+}
+// function key = keystr(a, b)
+// 	key = rounddecimals(hash(a, b), 4);
+// key = num2str(key);
 
 int main()
 {
@@ -39,5 +55,20 @@ int main()
 	// std::cout << "Da matrix is " << (isStable(ones) ? "Stable" : "Unstable");
 
 	// std::cin.get();
-	std::cout << 10e-4;
+	// std::cout << 10e-4;
+
+	std::map<double,int> a;
+
+	a.insert(std::pair<double,int>(3.1416,3) );
+	a.insert(std::pair<double,int>(3.14,32) );
+	a.insert(std::pair<double,int>(4.5,76) );
+
+	std::cout<<a[4.5]<<std::endl;
+	std::cout << a[3.14] << std::endl;
+	std::cout << a[3.1416] << std::endl;
+
+	std::map<std::pair<double,double>, int> b;
+
+	b.insert(std::pair< std::pair<double,double >, int>( , 3));
+
 }
