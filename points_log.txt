@@ -598,3 +598,47 @@ Parameters:
 Stable
 finished computation at Wed Sep  5 21:22:04 2018
 elapsed time: 2395.09s
+========================================================
+Castiglione model searching in several periods
+ Working with
+5 intervals 
+, tau: 1000, d: 0.5
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.001,0.005,10,0.1,1,0.001,0.005,10,0.1,1,0.02,1,0.1,0.1,0.1,1e-06,0.1,)
+ Points Founded:
+None
+finished computation at Sat Sep  8 15:35:00 2018
+elapsed time: 0.0102361s
+========================================================
+Castiglione model searching in several periods
+ Working with
+5 intervals 
+, tau: 1000, d: 0.5
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.001,0.005,10,0.1,1,0.001,0.005,10,0.1,1,0.02,1,0.1,0.1,0.1,1e-06,0.1,)
+ Points Founded:
+[0.207130,0.203731,0.000000,0.000000,0.000000,]
+finished computation at Sat Sep  8 15:40:12 2018
+elapsed time: 0.00782157s
+========================================================
+Castiglione model searching in several periods
+ Working with
+5 intervals 
+, tau: 1000, d: 0.5
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.001,0.005,10,0.1,1,0.001,0.005,10,0.1,1,0.02,1,0.1,0.1,0.1,1e-06,0.1,)
+ Points Founded:
+[0.207130,0.203731,0.000000,0.000000,0.000000,]
+finished computation at Sat Sep  8 17:16:01 2018
+elapsed time: 0.00682114s
+========================================================
+Castiglione model searching in several periods
+ Working with
+5 intervals 
+, tau: 1000, d: 0.5
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,)
+ Points Founded:
+[0.042971,0.027236,0.847949,0.000278,0.000158,]
+finished computation at Sat Sep  8 17:17:19 2018
+elapsed time: 0.00594467s

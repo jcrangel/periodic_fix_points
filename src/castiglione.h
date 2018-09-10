@@ -16,6 +16,7 @@ private:
 	std::vector<Doub> parameters;
 	const int systemSize = 5; // number of states
 	int controlIndex = 3;	 // The index of the state where the control happens
+	int tumorIndex = 2;     // The index were the tumor is located M var in this case
 	const int numParameters = 17;
 	Doub a0, b0, c0, d0, f0;
 	Doub a1, b1, c1, d1, f1;
@@ -100,6 +101,10 @@ public:
 	int getControlIndex()
 	{
 		return controlIndex;
+	}
+	int getTumorIndex()
+	{
+		return tumorIndex;
 	}
 };
 

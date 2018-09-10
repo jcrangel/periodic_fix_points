@@ -385,6 +385,25 @@ VectorEigen evalFunInLast(T &functionName, StateType initialCondition, Doub tau,
 	//initialCondition has the last
 }
 
+/**
+ *Has a jump of size d at the start 
+ */
+template <class T>
+StateType evalFunInLastJump(T &functionName, StateType initialCondition, Doub t0, Doub tf,Doub d)
+{
+	int controlIndex = functionName.getControlIndex();
+	initialCondition[controlIndex] = initialCondition[controlIndex] + d;
+	int N = functionName.getSystemSize();
+	std::vector<Doub> res(N);
+	integrateSystem(functionName, initialCondition, res, t0, tf);
+
+	//To create the VectorEigenfrom the std::vector
+	//Doub* ptr = &res[0];
+	//Eigen::Map<VectorEigen> v(ptr, N);
+
+	return res;
+	//initialCondition has the last
+}
 /**********************************************************************************************//**
  * @fn	std::vector< std::vector<T> > cartesianProduct(const std::vector<T> A, const std::vector<T> B)
  *

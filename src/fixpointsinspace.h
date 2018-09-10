@@ -381,4 +381,42 @@ END:
 	return;
 };
 
+/***
+ * Search for the periodic fix point but on several intervals [ti,ti+i*tau] :
+ * [t0,tf]->[tf,tf+tau]->[tf+tau,tf+2tau]...
+ * t0 the initial time
+ * tf the first final time 
+ * 
+ */
+template <class T>
+StateType findperiodicPoint(Doub t0,Doub tf, StateType x0,T &functionName,Doub tau, Doub d, int maxIntervals){
+	StateType xf;
+	
+	xf = evalFunInLastJump(functionName, x0, t0,tf,0); // d=0 NO jump at the star
+
+	t0 = tf;
+	tf = tf+tau;
+	x0 = xf;
+	int n = 0;
+	int tumorIndex = functionName.getTumorIndex(); 
+	while (n < maxIntervals){
+		xf = evalFunInLastJump(functionName, x0, t0, tf, d); 
+		
+		if(equal(x0[tumorIndex], xf[tumorIndex])){
+			break;
+		}
+		t0 = tf;
+		tf = tf+tau;
+		x0 = xf;
+		n++;
+	}
+
+	if(n >= maxIntervals)
+		return StateType {-1};
+	else
+		return xf;	
+
+}
+
+
 #endif

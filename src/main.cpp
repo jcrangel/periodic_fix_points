@@ -8,7 +8,7 @@ Note:
   TODO: Put string name to the system so apper in the text 
 
 */
-#include "al21managerCastiglione.h"
+#include "fixpoinSeveralPeriodsCastiglionemanager.h"
 #include "util.h"
 #include <chrono>
 #include <ctime>
