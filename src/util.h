@@ -15,6 +15,10 @@ Common data type definition and functions for vector manipulation.
 #include <fstream>
 #include <cmath>
 #include <vector>
+#include <map>
+#include <iomanip>
+#include <sstream>
+#include <string>
 
 //Eigen lib
 #include <Eigen/Dense>
@@ -64,6 +68,58 @@ public:
 		stability(stability_),
 		solution(solution_) {}
 };
+
+struct point {
+	Doub x=0;
+	Doub y=0;
+
+	point(Doub x, Doub y) : x(x), y(y) {};
+
+};
+/*
+*Basically a square 
+*/
+class cell2D {
+public:
+	point p1;
+	point p2;
+	point p3;
+	point p4;
+
+	cell2D(point p1, point p2, point p3, point p4) :
+		p1(p1), p2(p2), p3(p3), p4(p4) {}
+
+	friend std::ostream& operator << (std::ostream& out, const cell2D &cell) {
+		out << cell.p1.x << "," << cell.p1.y << "\n";
+		out << cell.p2.x << "," << cell.p2.y << "\n";
+		out << cell.p3.x << "," << cell.p3.y << "\n";
+		out << cell.p4.x << "," << cell.p4.y << "\n";
+		return out;
+	}
+
+};
+/* The container for the critical cells*/
+typedef std::vector<cell2D> setCriticalCells;
+
+/*
+Converts to doubles to string and gives the concatenation. To use for
+the index in a "multiindex" map:
+std::map<std::string, int> g;
+double x = 3.1416123254;
+double y = x/10;
+g.insert(std::pair<std::string,int> (strtokey(x,y),1 ) );
+*/
+
+std::string strtokey(double a, double b, int precision = 5) {
+	std::stringstream stream;
+	stream << std::fixed << std::setprecision(precision) << a;
+	std::string as = stream.str();
+	//https://stackoverflow.com/questions/20731/how-do-you-clear-a-stringstream-variable
+	stream.str(std::string());
+	stream << std::fixed << std::setprecision(precision) << b;
+	std::string bs = stream.str();
+	return as + bs;
+}
 
 /**********************************************************************************************//**
  * @fn	template <class T> void transpose(const T u, std::vector < StateType > & state )
@@ -404,6 +460,9 @@ StateType evalFunInLastJump(T &functionName, StateType initialCondition, Doub t0
 	return res;
 	//initialCondition has the last
 }
+
+
+
 /**********************************************************************************************//**
  * @fn	std::vector< std::vector<T> > cartesianProduct(const std::vector<T> A, const std::vector<T> B)
  *

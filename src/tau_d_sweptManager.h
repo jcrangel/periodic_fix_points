@@ -6,7 +6,7 @@ This is acts as a interface for algorithm 21 for managing data, etc.
 
 **/
 #include "castiglione.h"
-#include "fixpointsinspace.h"
+#include "parameterswept.h"
 #include <fstream>
 #include <iomanip>
 #include <vector>
@@ -39,37 +39,36 @@ void runAl21()
 
 	std::vector<Doub> PARAMETERS = { a0, b0, c0, d0, f0, a1, b1, c1, d1, f1,
 									 d2, f2, e2, e3, a4, c4, e4 };
-	Doub tau = 1000, dose = 0.5;
+	//Doub tau = 1000, dose = 0.5;
 	//std::cin >> tau >> d;
 	Castiglione fun(PARAMETERS);
 	StateType x0{1e-4 / 0.005, 1e-4 / 0.005, 0.1, 0, 0};  
-	int maxIntervals=5; 
-	//StateType point = findperiodicPoint(0, 1000, x0,fun,tau,dose, maxIntervals);
-	StateType point(x0);
-	Doub max = findperiodicPointGetMax(0, 1000, point, fun, tau, dose, maxIntervals);
-	//std::ofstream points("points.txt", std::ios::out | std::ios::trunc);
 
+	//std::ofstream points("points.txt", std::ios::out | std::ios::trunc);
+	Doub taui = 10;
+	Doub tauf = 1200;
+	Doub di = 0.01;
+	Doub df = 1;
+	setCriticalCells Cri;
+	Doub tumorBound=0.8*f2;// percentage of carrying capacity
+	Cri= al23_tau_d(taui, tauf, di, df, 10,10, fun, tumorBound, x0, fun.getTumorIndex());
 	LogAndStdout lcout("points_log.txt");
 
 	lcout << "========================================================\n";
-	lcout << "Castiglione model searching in several periods\n Working with\n";
-	lcout << maxIntervals << " intervals \n";
-	lcout << ", tau: " << tau << ", d: " << dose << "\n";
+	lcout << "Castiglione parameter swepting tau and d\n";
+	lcout << "tau=[" << taui << "," << tauf << "]\n";
+	lcout << "d=[" << di << "," << df << "]\n";
 	lcout << "Parameters:\n ";
 	lcout << "(a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(";
 	for (Doub i : PARAMETERS)
 		lcout << i << ",";
-	lcout << ")\n Points Founded:\n";
-	lcout << std::fixed << std::setprecision(6);
-	if (point[0] == -1)
-		lcout << "None\n";
-	else{
-		lcout<<"[";
-		for (Doub i: point)
-			lcout<<i << ",";
-		lcout<<"]\n";	
+
+	std::ofstream out("points.txt", std::ios::out );
+	for (cell2D cell : Cri) {
+		out << cell;
 	}
-	lcout << "Max value on interval:" << max<<"\n";
+	lcout << "Tumor upper bound: " << tumorBound << "\n";
+	lcout << "\nCritical cell point data saved to points.txt\n";
 	/*std::cin.get();*/
 }
 

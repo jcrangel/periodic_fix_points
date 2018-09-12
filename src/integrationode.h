@@ -39,6 +39,25 @@ struct push_back_state_and_time
 	}
 };
 
+/*
+State observer that gets the max of all x values 
+in the integration interval.
+*/
+struct GetMax {
+	double &max;
+	int indexMaxVar; //The index variable of which max is required.
+	GetMax(double &max_, int indexMaxVar_) :
+		max(max_), indexMaxVar(indexMaxVar_)
+	{
+		max = -std::numeric_limits<double>::max();
+	}
+
+	void operator()(const StateType &x, double /*t*/) {
+		if (x[indexMaxVar] > max)
+			max = x[indexMaxVar];
+	}
+
+};
 /**********************************************************************************************//**
  * @fn	template <class T> void integrateSystem(T &system, StateType initialCondition, StateType &x, Doub t0, Doub tf)
  *
@@ -64,6 +83,28 @@ void integrateSystem(T &system, StateType initialCondition, StateType &x, Doub t
 		system, initialCondition, t0, tf, 0.001);
 	x = initialCondition;
 }
+
+
+/*
+TODO: Add _j to all funcs that add a jump
+Integrates and get the max of the tumor var
+*/
+template <class T>
+Doub integrateSystemGetMaxTumor_j(T &system, StateType& initialCondition, Doub t0, Doub tf,Doub d) {
+	typedef runge_kutta_dopri5<StateType> error_stepper_type;
+	Doub max;
+	int controlIndex = system.getControlIndex();
+	initialCondition[controlIndex] = initialCondition[controlIndex] + d;
+	Doub tumorIndex = system.getTumorIndex();
+	size_t steps = integrate_adaptive(make_controlled<error_stepper_type>(1.0e-10, 1.0e-6),
+		system, initialCondition, t0, tf, 0.001,GetMax(max,tumorIndex));
+	
+
+	return max;
+
+}
+
+
 
 /**********************************************************************************************//**
  * @fn	template <class T> void integrateStiffSystem(T &system, StateType initialCondition, StateType &x, Doub t0, Doub tf)

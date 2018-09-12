@@ -642,3 +642,216 @@ Parameters:
 [0.042971,0.027236,0.847949,0.000278,0.000158,]
 finished computation at Sat Sep  8 17:17:19 2018
 elapsed time: 0.00594467s
+========================================================
+Castiglione parameter swepting tau and dtau=[200,1200]
+d=[0.1,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Critical cell point data saved to points.txt
+finished computation at Tue Sep 11 17:53:28 2018
+elapsed time: 1.16507s
+========================================================
+Castiglione parameter swepting tau and dtau=[200,1200]
+d=[0.1,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Critical cell point data saved to points.txt
+finished computation at Tue Sep 11 17:54:04 2018
+elapsed time: 1.25507s
+========================================================
+Castiglione parameter swepting tau and dtau=[200,2000]
+d=[0.1,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Critical cell point data saved to points.txt
+finished computation at Tue Sep 11 19:05:03 2018
+elapsed time: 1.03506s
+========================================================
+Castiglione parameter swepting tau and dtau=[200,1000]
+d=[0.1,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Critical cell point data saved to points.txt
+finished computation at Tue Sep 11 19:05:56 2018
+elapsed time: 1.21407s
+========================================================
+Castiglione parameter swepting tau and dtau=[200,1200]
+d=[0.1,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Critical cell point data saved to points.txt
+finished computation at Tue Sep 11 19:06:33 2018
+elapsed time: 1.19507s
+========================================================
+Castiglione parameter swepting tau and dtau=[200,1200]
+d=[0.1,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Critical cell point data saved to points.txt
+finished computation at Tue Sep 11 19:19:55 2018
+elapsed time: 7.88045s
+========================================================
+Castiglione parameter swepting tau and dtau=[200,1200]
+d=[0.1,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Critical cell point data saved to points.txt
+finished computation at Tue Sep 11 19:21:00 2018
+elapsed time: 0.17401s
+========================================================
+Castiglione parameter swepting tau and dtau=[200,1200]
+d=[0.1,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Critical cell point data saved to points.txt
+finished computation at Tue Sep 11 20:17:19 2018
+elapsed time: 2.29513s
+========================================================
+Castiglione parameter swepting tau and dtau=[200,1200]
+d=[0.1,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Critical cell point data saved to points.txt
+finished computation at Tue Sep 11 20:43:58 2018
+elapsed time: 29.7147s
+========================================================
+Castiglione parameter swepting tau and dtau=[200,1200]
+d=[0.1,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Critical cell point data saved to points.txt
+finished computation at Tue Sep 11 20:47:44 2018
+elapsed time: 2.38914s
+========================================================
+Castiglione parameter swepting tau and dtau=[200,1200]
+d=[0.1,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Critical cell point data saved to points.txt
+finished computation at Tue Sep 11 20:49:32 2018
+elapsed time: 2.17312s
+========================================================
+Castiglione parameter swepting tau and dtau=[200,1200]
+d=[0.1,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Critical cell point data saved to points.txt
+finished computation at Tue Sep 11 21:52:25 2018
+elapsed time: 7.81445s
+========================================================
+Castiglione parameter swepting tau and dtau=[100,2000]
+d=[0.1,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Critical cell point data saved to points.txt
+finished computation at Tue Sep 11 21:57:09 2018
+elapsed time: 7.58643s
+========================================================
+Castiglione parameter swepting tau and dtau=[200,1200]
+d=[0.1,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Critical cell point data saved to points.txt
+finished computation at Tue Sep 11 22:00:23 2018
+elapsed time: 8.01446s
+========================================================
+Castiglione model searching in several periods
+ Working with
+5 intervals 
+, tau: 1000, d: 0.5
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,)
+ Points Founded:
+[0.042971,0.027236,0.847949,0.000278,0.000158,]
+finished computation at Wed Sep 12 10:59:11 2018
+elapsed time: 0.0110006s
+========================================================
+Castiglione model searching in several periods
+ Working with
+5 intervals 
+, tau: 1000, d: 0.5
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,)
+ Points Founded:
+[0.020000,0.020000,0.100000,0.000000,0.000000,]
+finished computation at Wed Sep 12 11:05:21 2018
+elapsed time: 0.0370022s
+========================================================
+Castiglione model searching in several periods
+ Working with
+5 intervals 
+, tau: 1000, d: 0.5
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,)
+ Points Founded:
+[0.042972,0.027235,0.847953,0.000278,0.000158,]
+finished computation at Wed Sep 12 11:18:45 2018
+elapsed time: 0.0140008s
+========================================================
+Castiglione model searching in several periods
+ Working with
+5 intervals 
+, tau: 1000, d: 0.5
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,)
+ Points Founded:
+[0.042972,0.027235,0.847953,0.000278,0.000158,]
+Max value on interval:0.858698
+finished computation at Wed Sep 12 11:20:02 2018
+elapsed time: 0.0090005s
+========================================================
+Castiglione model searching in several periods
+ Working with
+5 intervals 
+, tau: 1000, d: 0.5
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,)
+ Points Founded:
+[0.042972,0.027235,0.847953,0.000278,0.000158,]
+Max value on interval:0.858698
+finished computation at Wed Sep 12 11:23:22 2018
+elapsed time: 0.0120007s
+========================================================
+Castiglione parameter swepting tau and dtau=[200,1200]
+d=[0.1,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Critical cell point data saved to points.txt
+finished computation at Wed Sep 12 11:33:28 2018
+elapsed time: 8.12346s
+========================================================
+Castiglione parameter swepting tau and dtau=[200,1200]
+d=[0.1,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Critical cell point data saved to points.txt
+finished computation at Wed Sep 12 11:35:49 2018
+elapsed time: 33.2979s
+========================================================
+Castiglione parameter swepting tau and dtau=[10,1200]
+d=[0.01,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Critical cell point data saved to points.txt
+finished computation at Wed Sep 12 11:38:39 2018
+elapsed time: 28.4236s
+========================================================
+Castiglione parameter swepting tau and dtau=[10,1200]
+d=[0.01,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Critical cell point data saved to points.txt
+finished computation at Wed Sep 12 14:00:05 2018
+elapsed time: 35.8751s
+========================================================
+Castiglione parameter swepting tau and d
+tau=[10,1200]
+d=[0.01,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Tumor upper bound: 0.8
+
+Critical cell point data saved to points.txt
+finished computation at Wed Sep 12 14:08:25 2018
+elapsed time: 16.5769s
+========================================================
+Castiglione parameter swepting tau and d
+tau=[10,1200]
+d=[0.01,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Tumor upper bound: 0.8
+
+Critical cell point data saved to points.txt
+finished computation at Wed Sep 12 15:13:53 2018
+elapsed time: 2.95617s
+========================================================
+Castiglione parameter swepting tau and d
+tau=[10,1200]
+d=[0.01,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Tumor upper bound: 0.8
+
+Critical cell point data saved to points.txt
+finished computation at Wed Sep 12 15:22:39 2018
+elapsed time: 16.5649s

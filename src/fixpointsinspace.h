@@ -417,6 +417,43 @@ StateType findperiodicPoint(Doub t0,Doub tf, StateType x0,T &functionName,Doub t
 		return xf;	
 
 }
+/*
+Save the last x value in the initial condition x0
+*/
+template <class T>
+Doub findperiodicPointGetMax(Doub t0, Doub tf, StateType &x0, T &functionName, Doub tau, Doub d, int maxIntervals) {
+	StateType xf;
+
+	xf = evalFunInLastJump(functionName, x0, t0, tf, 0); // d=0 NO jump at the star
+
+	t0 = tf;
+	tf = tf + tau;
+	x0 = xf;
+	int n = 0;
+	int tumorIndex = functionName.getTumorIndex();
+	Doub max;
+	while (n < maxIntervals) {
+		//StateType sol;
+		//sol = x0;
+		//xf = x0;//Initial condition and were the last will be returned
+		max = integrateSystemGetMaxTumor_j(functionName, xf, t0, tf, d);
+		//xf = sol;
+		if (equal(x0[tumorIndex], xf[tumorIndex])) {
+			break;
+		}
+		t0 = tf;
+		tf = tf + tau;
+		x0 = xf;
+		n++;
+	}
+	//TODO the tumor var doesn't necesary have negative values.
+	//But can happen for other systems. Get another error flag
+	if (n >= maxIntervals)
+		return  -1 ;
+	else
+		return max;
+
+}
 
 
 #endif

@@ -70,6 +70,24 @@ struct push_back_state_and_time
     }
 };
 //]
+struct GetMax{
+    double &max;
+    int indexMaxVar; 
+
+    GetMax (double &max_, int indexMaxVar_ ):
+    max(max_), indexMaxVar(indexMaxVar_)
+    {
+        max = -std::numeric_limits<double>::max(); 
+    }
+
+    void operator()(const state_type &x, double /*t*/){
+        if(x[indexMaxVar] > max)
+            max = x[indexMaxVar];
+    }
+
+};
+
+
 
 struct write_state
 {
@@ -88,123 +106,130 @@ int main(int /* argc */ , char** /* argv */ )
 
     //[ state_initialization
     state_type x(2);
-    x[0] = 1.0; // start at x=1.0, p=0.0
-    x[1] = 0.0;
+    x[0] = 0.5; // start at x=1.0, p=0.0
+    x[1] = 2.0;
     //]
 
 
 
     //[ integration
-    size_t steps = integrate( harmonic_oscillator ,
-            x , 0.0 , 10.0 , 0.1 );
+    // size_t steps = integrate( harmonic_oscillator ,
+    //         x , 0.0 , 10.0 , 0.1 );
+    // //]
+
+
+
+    // //[ integration_class
+    // harm_osc ho(0.15);
+    // steps = integrate( ho ,
+    //         x , 0.0 , 10.0 , 0.1 );
     //]
 
 
 
-    //[ integration_class
-    harm_osc ho(0.15);
-    steps = integrate( ho ,
-            x , 0.0 , 10.0 , 0.1 );
-    //]
 
-
-
-
-
+    size_t steps;
     //[ integrate_observ
     vector<state_type> x_vec;
     vector<double> times;
+    double max=-1;
+    steps = integrate( harmonic_oscillator ,
+            x , 0.0 , 10.0 , 0.1 ,
+            GetMax( max , 0 ) );
 
+    cout << max << endl;
+    x[0] = 0.5; // start at x=1.0, p=0.0
+    x[1] = 2.0;
     steps = integrate( harmonic_oscillator ,
             x , 0.0 , 10.0 , 0.1 ,
             push_back_state_and_time( x_vec , times ) );
 
     // /* output */
-    // for( size_t i=0; i<=steps; i++ )
+    for( size_t i=0; i<=steps; i++ )
+    {
+        cout << times[i] << "\t\t" << x_vec[i][0] << "\t \t" << x_vec[i][1] << '\n';
+    }
+    //]
+
+
+
+
+
+
+
+    // //[ define_const_stepper
+    // runge_kutta4< state_type > stepper;
+    // integrate_const( stepper , harmonic_oscillator , x , 0.0 , 10.0 , 0.01 );
+    // //]
+
+
+
+
+    // //[ integrate_const_loop
+    // const double dt = 0.01;
+    // for( double t=0.0 ; t<10.0 ; t+= dt )
+    //     stepper.do_step( harmonic_oscillator , x , t , dt );
+    // //]
+
+
+
+
+    // //[ define_adapt_stepper
+    // typedef runge_kutta_cash_karp54< state_type > error_stepper_type;
+    // //]
+
+
+    // x[0] = 0;
+    // x[1] = 1;
+    // //[ integrate_adapt
+    // typedef controlled_runge_kutta< error_stepper_type > controlled_stepper_type;
+    // controlled_stepper_type controlled_stepper;
+    // integrate_adaptive( controlled_stepper , ho , x , 0.0 , 10.0 , 0.01 );
+    // //]
+    // cout << x[0] << " , " << x[1] << endl;
+
     // {
-    //     cout << times[i] << '\t' << x_vec[i][0] << '\t' << x_vec[i][1] << '\n';
+    // //[integrate_adapt_full
+    // double abs_err = 1.0e-10 , rel_err = 1.0e-6 , a_x = 1.0 , a_dxdt = 1.0;
+    // controlled_stepper_type controlled_stepper( 
+    //     default_error_checker< double , range_algebra , default_operations >( abs_err , rel_err , a_x , a_dxdt ) );
+    // integrate_adaptive( controlled_stepper , harmonic_oscillator , x , 0.0 , 10.0 , 0.01 );
+    // //]
     // }
-    //]
+
+
+    // //[integrate_adapt_make_controlled
+    // integrate_adaptive( make_controlled< error_stepper_type >( 1.0e-10 , 1.0e-6 ) , 
+    //                     harmonic_oscillator , x , 0.0 , 10.0 , 0.01 );
+    // //]
 
 
 
 
+    // //[integrate_adapt_make_controlled_alternative
+    // integrate_adaptive( make_controlled( 1.0e-10 , 1.0e-6 , error_stepper_type() ) , 
+    //                     harmonic_oscillator , x , 0.0 , 10.0 , 0.01 );
+    // //]
 
-
-
-    //[ define_const_stepper
-    runge_kutta4< state_type > stepper;
-    integrate_const( stepper , harmonic_oscillator , x , 0.0 , 10.0 , 0.01 );
-    //]
-
-
-
-
-    //[ integrate_const_loop
-    const double dt = 0.01;
-    for( double t=0.0 ; t<10.0 ; t+= dt )
-        stepper.do_step( harmonic_oscillator , x , t , dt );
-    //]
-
-
-
-
-    //[ define_adapt_stepper
-    typedef runge_kutta_cash_karp54< state_type > error_stepper_type;
-    //]
-
-
-    x[0] = 0;
-    x[1] = 1;
-    //[ integrate_adapt
-    typedef controlled_runge_kutta< error_stepper_type > controlled_stepper_type;
-    controlled_stepper_type controlled_stepper;
-    integrate_adaptive( controlled_stepper , ho , x , 0.0 , 10.0 , 0.01 );
-    //]
-    cout << x[0] << " , " << x[1] << endl;
-
-    {
-    //[integrate_adapt_full
-    double abs_err = 1.0e-10 , rel_err = 1.0e-6 , a_x = 1.0 , a_dxdt = 1.0;
-    controlled_stepper_type controlled_stepper( 
-        default_error_checker< double , range_algebra , default_operations >( abs_err , rel_err , a_x , a_dxdt ) );
-    integrate_adaptive( controlled_stepper , harmonic_oscillator , x , 0.0 , 10.0 , 0.01 );
-    //]
-    }
-
-
-    //[integrate_adapt_make_controlled
-    integrate_adaptive( make_controlled< error_stepper_type >( 1.0e-10 , 1.0e-6 ) , 
-                        harmonic_oscillator , x , 0.0 , 10.0 , 0.01 );
-    //]
-
-
-
-
-    //[integrate_adapt_make_controlled_alternative
-    integrate_adaptive( make_controlled( 1.0e-10 , 1.0e-6 , error_stepper_type() ) , 
-                        harmonic_oscillator , x , 0.0 , 10.0 , 0.01 );
-    //]
-
-    #ifdef BOOST_NUMERIC_ODEINT_CXX11
-    //[ define_const_stepper_cpp11
-    {
-    runge_kutta4< state_type > stepper;
-    integrate_const( stepper , []( const state_type &x , state_type &dxdt , double t ) {
-            dxdt[0] = x[1]; dxdt[1] = -x[0] - gam*x[1]; }
-        , x , 0.0 , 10.0 , 0.01 );
-    }
-    //]
+    // #ifdef BOOST_NUMERIC_ODEINT_CXX11
+    // //[ define_const_stepper_cpp11
+    // {
+    // runge_kutta4< state_type > stepper;
+    // integrate_const( stepper , []( const state_type &x , state_type &dxdt , double t ) {
+    //         dxdt[0] = x[1]; dxdt[1] = -x[0] - gam*x[1]; }
+    //     , x , 0.0 , 10.0 , 0.01 );
+    // }
+    // //]
     
     
     
-    //[ harm_iterator_const_step]
-    // std::for_each( make_const_step_time_iterator_begin( stepper , harmonic_oscillator, x , 0.0 , 0.1 , 10.0 ) ,
-    //                make_const_step_time_iterator_end( stepper , harmonic_oscillator, x ) ,
-    //                []( std::pair< const state_type & , const double & > x ) {
-    //                    cout << x.second << " " << x.first[0] << " " << x.first[1] << "\n"; } );
-    //]
-    #endif
+    // //[ harm_iterator_const_step]
+    // // std::for_each( make_const_step_time_iterator_begin( stepper , harmonic_oscillator, x , 0.0 , 0.1 , 10.0 ) ,
+    // //                make_const_step_time_iterator_end( stepper , harmonic_oscillator, x ) ,
+    // //                []( std::pair< const state_type & , const double & > x ) {
+    // //                    cout << x.second << " " << x.first[0] << " " << x.first[1] << "\n"; } );
+    // //]
+    // #endif
     
     
 

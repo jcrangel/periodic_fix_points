@@ -6,9 +6,11 @@ Note:
   for everything
 
   TODO: Put string name to the system so apper in the text 
+  TODO: Homogenize the arguments in functions like, initial condition, x
+
 
 */
-#include "fixpoinSeveralPeriodsCastiglionemanager.h"
+#include "tau_d_sweptManager.h"
 #include "util.h"
 #include <chrono>
 #include <ctime>

@@ -16,9 +16,9 @@
  * @date	7/17/2018
  **************************************************************************************************/
 
-class ItikBanks
+struct ItikBanks
 {
-private:
+
 	std::vector<Doub> parameters;//TODO: Check for the correct size
 	const int systemSize = 3; // number of ODEs of the system
 	int controlIndex = 2; // The index of the state where the control happens
@@ -53,7 +53,6 @@ private:
 	 *
 	 * @param	parameters	Options for controlling the operation.
 	 **************************************************************************************************/
-public:
 	ItikBanks(std::vector<Doub> parameters) : parameters(parameters) {
 		loadParameters();
 	}
