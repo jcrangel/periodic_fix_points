@@ -855,3 +855,43 @@ Parameters:
 Critical cell point data saved to points.txt
 finished computation at Wed Sep 12 15:22:39 2018
 elapsed time: 16.5649s
+========================================================
+Castiglione parameter swepting tau and d
+tau=[10,1200]
+d=[0.01,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Tumor upper bound: 0.8
+
+Critical cell point data saved to points.txt
+finished computation at Wed Sep 12 15:57:07 2018
+elapsed time: 16.1459s
+========================================================
+Castiglione parameter swepting tau and d
+tau=[10,1200]
+d=[0.01,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Tumor upper bound: 0.8
+
+Critical cell point data saved to points.txt
+finished computation at Wed Sep 12 18:10:11 2018
+elapsed time: 3.32519s
+========================================================
+Castiglione parameter swepting tau and d
+tau=[10,1200]
+d=[0.01,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Tumor upper bound: 0.8
+
+Critical cell point data saved to points.txt
+finished computation at Wed Sep 12 18:13:41 2018
+elapsed time: 65.5968s
+========================================================
+Castiglione parameter swepting tau and d
+tau=[10,1200]
+d=[0.01,1]
+Parameters:
+ (a0, b0, c0, d0, f0, a1, b1, c1, d1, f1 d2, f2, e2, e3, a4, c4, e4 )=(0.0001,0.005,10,0.01,1,0.0001,0.005,10,0.01,1,0.02,1,0.1,0.1,0.01,1e-07,0.01,Tumor upper bound: 0.9
+
+Critical cell point data saved to points.txt
+finished computation at Wed Sep 12 18:40:39 2018
+elapsed time: 10.8286s

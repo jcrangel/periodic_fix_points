@@ -7,6 +7,8 @@ Note:
 
   TODO: Put string name to the system so apper in the text 
   TODO: Homogenize the arguments in functions like, initial condition, x
+  TODO: The algorithm can be made more eficently if at each domain partition, we dont explore the corners
+  TODO: The algorithm seem to give slightly diferents graphs if we cahnge the values of M and N at start
 
 
 */

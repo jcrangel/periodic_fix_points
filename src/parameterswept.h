@@ -34,10 +34,10 @@ setCriticalCells al23_tau_d(Doub tau0, Doub taum, Doub d0, Doub dm,  int M, int 
 	//%A map : (tau, d)-># 1 if the periodic fix point under the threshold, 2 if not,
 	//0 periodic point 
 	// false otherwise
-	std::map<std::string, int> S;
+	std::map<std::string, bool> S;
 	
 	//%A map : (tau, d)->#Fix point founded
-	//std::map<std::string, bool> Q;
+	std::map<std::string, bool> Q;
 	
 	StateType periodicPoint;
 	//%Step 2 , we're swepting over r2 and d. In the corner points
@@ -53,7 +53,11 @@ setCriticalCells al23_tau_d(Doub tau0, Doub taum, Doub d0, Doub dm,  int M, int 
 			//TODO: Save also when the algorithm doesn't found the periodic point
 			std::string key = strtokey(i, j);
 
-			if (max == -1) continue; // No point founded
+			if (max == -1) {
+				Q.insert(std::pair<std::string, bool>(key, false));
+				continue; // No point founded
+			}else
+				Q.insert(std::pair<std::string, bool>(key, true));
 			//Save the first three colums of O.That is all the fixed points in (i, j).
 			//zaiss = size(O);
 
@@ -73,10 +77,16 @@ setCriticalCells al23_tau_d(Doub tau0, Doub taum, Doub d0, Doub dm,  int M, int 
 			//Chanching d using  j and we let the system to run withput therapy for one period
 			//of size i
 			Doub max = findperiodicPointGetMax(0, i, ic, func, i, j, 20);
-			if (max == -1) continue; // No point founded
+			std::string key = strtokey(i, j);
+
+			if (max == -1) {
+				Q.insert(std::pair<std::string, bool>(key, false));
+				continue; // No point founded
+			}
+			else
+				Q.insert(std::pair<std::string, bool>(key, true));
 			//Save the first three colums of O.That is all the fixed points in (i, j).
 			//zaiss = size(O);
-			std::string key = strtokey(i, j);
 
 			S.insert(std::pair<std::string, bool>(key, max <= upperBound));
 			//The numbers of rows is the numbers fixed points.
@@ -133,7 +143,7 @@ void al24_tau_d(Doub tau0, Doub taum, Doub d0, Doub dm,
 	std::map<std::string, bool> S;
 
 	//%A map : (tau, d)->#Number stable fix points
-	//std::map<std::string, int> Q;
+	std::map<std::string, bool> Q;
 
 	StateType periodicPoint;
 	//%Step 2 , we're swepting over r2 and d. In the corner points
@@ -147,10 +157,16 @@ void al24_tau_d(Doub tau0, Doub taum, Doub d0, Doub dm,
 			//of size i
 			Doub max = findperiodicPointGetMax(0, i, ic, func, i, j, 20);
 			//TODO: Save also when the algorithm doesn't found the periodic point
-			if (max == -1) continue; // No point founded
-									 //Save the first three colums of O.That is all the fixed points in (i, j).
-									 //zaiss = size(O);
 			std::string key = strtokey(i, j);
+
+			if (max == -1) {
+				Q.insert(std::pair<std::string, bool>(key, false));
+				continue; // No point founded
+			}
+			else
+				Q.insert(std::pair<std::string, bool>(key, true));
+			//Save the first three colums of O.That is all the fixed points in (i, j).
+			//zaiss = size(O);
 
 			S.insert(std::pair<std::string, bool>(key, max <= upperBound));
 
@@ -167,10 +183,16 @@ void al24_tau_d(Doub tau0, Doub taum, Doub d0, Doub dm,
 			//Chanching d using  j and we let the system to run withput therapy for one period
 			//of size i
 			Doub max = findperiodicPointGetMax(0, i, ic, func, i, j, 20);
-			if (max == -1) continue; // No point founded
-									 //Save the first three colums of O.That is all the fixed points in (i, j).
-									 //zaiss = size(O);
 			std::string key = strtokey(i, j);
+
+			if (max == -1) {
+				Q.insert(std::pair<std::string, bool>(key, false));
+				continue; // No point founded
+			}
+			else
+				Q.insert(std::pair<std::string, bool>(key, true));
+			//Save the first three colums of O.That is all the fixed points in (i, j).
+			//zaiss = size(O);
 
 			S.insert(std::pair<std::string, bool>(key, max <= upperBound));
 			//The numbers of rows is the numbers fixed points.
@@ -190,8 +212,11 @@ void al24_tau_d(Doub tau0, Doub taum, Doub d0, Doub dm,
 			Doub jhalf = d0 + (y + 0.5)*hd;
 			//Step 5
 			//if some point have a diferent value that cell is critical
-			if (!(S[strtokey(i, j)] == S[strtokey(iplus, j)] == S[strtokey(i, jplus)] ==
-				S[strtokey(iplus, jplus)] == S[strtokey(ihalf, jhalf)])) {
+			if ( !(S[strtokey(i, j)] == S[strtokey(iplus, j)] == S[strtokey(i, jplus)] ==
+				S[strtokey(iplus, jplus)] == S[strtokey(ihalf, jhalf)]) || 
+				!(Q[strtokey(i, j)] == Q[strtokey(iplus, j)] == Q[strtokey(i, jplus)] ==
+				Q[strtokey(iplus, jplus)] == Q[strtokey(ihalf, jhalf)]) 
+				){
 				//We normalize the tau with the maximum tau
 				if (level == maxLevel)// Insert t					
 					Cri.push_back(cell2D(point(i , j), point(iplus , j), point(i , jplus), point(iplus , jplus)));
