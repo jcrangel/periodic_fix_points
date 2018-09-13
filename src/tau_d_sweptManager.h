@@ -50,7 +50,7 @@ void runAl21()
 	Doub di = 0.01;
 	Doub df = 1;
 	setCriticalCells Cri;
-	Doub tumorBound=0.9*f2;// percentage of carrying capacity
+	Doub tumorBound=0.8*f2;// percentage of carrying capacity
 	Cri= al23_tau_d(taui, tauf, di, df, 20,20, fun, tumorBound, x0, fun.getTumorIndex());
 	LogAndStdout lcout("points_log.txt");
 

@@ -94,6 +94,8 @@ setCriticalCells al23_tau_d(Doub tau0, Doub taum, Doub d0, Doub dm,  int M, int 
 	}
 
 //Step 4
+#pragma omp declare reduction (merge : setCriticalCells : omp_out.insert(omp_out.end(), omp_in.begin(), omp_in.end()))
+#pragma omp parallel for reduction(merge: Cri)
 	for (int x = 0; x < M; x++) {
 		for (int y = 0; y < N; y++) {
 
