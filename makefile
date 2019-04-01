@@ -10,8 +10,8 @@ TARGET := bin/runner
  
 SRCEXT := cpp
 SOURCES := src/main.cpp
-CFLAGS := -w -O2 # -Wall
-INC := -I/usr/local/boost_1_67_0/ -I/usr/local/eigen 
+CFLAGS := -w -O2 -std=c++11# -Wall
+INC := -I/home/rangel/boost_1_69_0/ -I/home/rangel/eigen 
 
 all: $(TARGET)
 
