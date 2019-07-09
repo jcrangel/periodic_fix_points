@@ -1,4 +1,4 @@
-## This project finds the fixed periodic points using thealgorithm made by Wei :
+## This project finds the periodic fixed points for an ODE system using the algorithm:
 Hsiu-Chuan Wei
 A modified numerical method for bifurcations of fixed points of ODE systems with periodically pulsed inputs
 
